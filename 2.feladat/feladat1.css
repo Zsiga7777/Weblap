@@ -1,0 +1,20 @@
+#tarolo{
+    width: 800px;
+    height: 300px;
+}
+
+#tarolo>div {
+    width: 100px;
+    height: 100px;
+    background-color: yellow;
+}
+
+#elem1{
+    background-color: green;
+}
+#elem2{
+    background-color: yellow;
+}
+#elem3{
+    background-color: purple;
+}
