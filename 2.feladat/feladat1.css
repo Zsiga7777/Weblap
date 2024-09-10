@@ -1,20 +1,27 @@
 #tarolo{
     width: 800px;
     height: 300px;
+    display: flex;
+    background-color: yellow;
+    justify-content: center;
 }
 
 #tarolo>div {
     width: 100px;
     height: 100px;
-    background-color: yellow;
+    
 }
 
 #elem1{
     background-color: green;
+    display: none;
 }
 #elem2{
     background-color: yellow;
+    display: none;
 }
 #elem3{
     background-color: purple;
+    align-self: center;
+    
 }

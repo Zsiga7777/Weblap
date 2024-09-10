@@ -1,0 +1,38 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+#tarolo1{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    background-color: purple;
+    align-items: center;
+}
+
+.elem1-1{
+    height: 30px;
+    width: 120px;
+    background-color: aqua;
+    margin-left: 15px;
+}
+
+#tarolo2
+{
+    width: 100%;
+    height: 800px;
+    display: flex;
+}
+#elem2-1
+{
+    flex: 2;
+    background-color: yellow;
+    height: 100%;
+}
+#elem2-2
+{
+    flex: 1;
+    background-color: green;
+    height: 100%;
+}

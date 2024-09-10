@@ -1,0 +1,25 @@
+body{
+    margin: 0;
+    padding: 0;
+}
+
+#tarolo{
+    width: 100%;
+    height: 400px;
+    display: flex;
+    background-color: yellow;
+    justify-content: left;
+    padding: 0;
+    margin: 0;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#tarolo>li {
+    width: 100px;
+    height: 100px;
+    background-color: purple;
+    list-style-type: none;
+
+}
+
