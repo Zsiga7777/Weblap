@@ -23,34 +23,40 @@ function numberLength2Or3(szov)
 {
 regex = /\b\d{2,3}\b/g
 result = szov.match(regex)
+return result
 }
 
 function startsWithEven (szov)
 {
 regex = /\b[2468]\d*\b/g
 result = szov.match(regex)
+return result
 }
 
 function startsWithNumber (szov)
 {
 regex = /\b\d+[a-zA-Z]+\b/g
 result = szov.match(regex)
+return result
 }
 
 function capitalized (szov)
 {
 regex = /\b[A-Z][a-z]*\b/g
 result = szov.match(regex)
+return result
 }
 
 function capitalizedLengthMin3 (szov)
 {
 regex = /\b[A-Z][a-z]{2,}\b/g
 result = szov.match(regex)
+return result
 }
 
 function startsWithVowel (szov)
 {
-regex = /\b[auioe]+\b/g
+regex = /\b[auioeAUIOE]\w*\b/g
 result = szov.match(regex)
+return result
 }
