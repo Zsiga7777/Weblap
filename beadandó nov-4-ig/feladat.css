@@ -1,0 +1,14 @@
+.grid-container
+{
+    display: grid;
+    grid-template-columns: 25px 25px 25px;
+   
+}
+
+#container
+{
+    position: absolute;
+    top: 45%;
+    left: 45%;
+    text-align: center;
+}
