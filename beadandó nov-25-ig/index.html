@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Tic Toc Toe</title>
+</head>
+<body>
+    <h1>Tic Toc Toe</h1>
+
+    <div id="playerSelection">
+        <p>Ellenfél választása:</p>
+        <input type="radio" name="jatekos" id="ember" checked>
+        <label for="ember">Ember</label><br>
+        <input type="radio" name="jatekos" id="gep">
+        <label for="ember">Gép</label><br>
+    </div>
+    
+    
+        <div id="grid-container">
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+            <div class="grid-item"></div>
+        </div>
+        <p id="eredmeny"></p>
+        <button onclick="restart()">Újra indítás</button>
+    <script src="script.js"></script>
+</body>
+</html>

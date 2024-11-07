@@ -1,0 +1,59 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    background-color: wheat;
+    display: flex;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+h1{
+    margin: 3vh 0 3vh 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#playerSelection
+{
+    margin-bottom: 3vh;
+    border-radius: 20px;
+    font-size: 18;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#grid-container
+{
+    width: 60vw;
+    display: grid;
+    grid-template-columns: 20vw 20vw 20vw;
+    margin-bottom: 3vh;
+   }
+.grid-item{
+    width: 20vw;
+    height: 20vh;
+    border: 2px black solid;
+    font-size: 10vh;
+    padding: 0;
+    text-align: center;
+}
+
+#eredmeny
+{
+    font-size: 18;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 3vh;
+}
+
+button {
+    padding: 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(220, 143, 20);
+}
