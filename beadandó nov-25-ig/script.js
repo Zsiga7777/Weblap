@@ -94,15 +94,12 @@ function checkWhoWins() {
             remainingSlots++;
         }
     }
-    
-    for (const combination of winning_combinations) {
-        const [a, b, c] = combination;
-        if (gridItems[a].innerHTML && gridItems[a].innerHTML === gridItems[b].innerHTML && gridItems[a].innerHTML === gridItems[c].innerHTML) {
+    let winner = getWinner(gridItems); 
+        if (winner != null) {
             gridContainer.setAttribute("disabled", true);
-            eredmeny.innerHTML = `${gridItems[a].innerHTML} nyert`;
+            eredmeny.innerHTML = `${winner} nyert`;
             won = true;
             return true;
-        }
     }
 
     if (remainingSlots == 0 && won == false) {
