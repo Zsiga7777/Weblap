@@ -72,4 +72,4 @@ function fizzbuzz(n)
   return result
 }
 
-console.log(myParseInt("111-111"))
+console.log(myParseInt("111*111"))
