@@ -6,13 +6,13 @@ function maskify(cc) {
         {
           result += "#";
         }
-      result += `${cc[cc.length-4]}${cc[cc.length-3]}${cc[cc.length-2]}${cc[cc.length-1]}`
+      result += `${cc[cc.length-4]}${cc[cc.length-3]}${cc[cc.length-2]}${cc[cc.length-1]}`;
     }
     else
       {
-        result = cc
+        result = cc;
       }
-    return result
+    return result;
   }
 
   function isTriangle(a,b,c)
@@ -27,7 +27,7 @@ function maskify(cc) {
     }
   else
     {
-      return true
+      return true;
       }
   
   
@@ -68,7 +68,7 @@ function timeConvert(num) {
   function createArrayOfTiers(num) {
     let result = [];
    let temp = "";
-   num = `${num}`
+   num = `${num}`;
    
    for(let i = 0; i < num.length; i++)
      {
@@ -76,5 +76,5 @@ function timeConvert(num) {
        result.push(temp);
      }
    
-   return result
+   return result;
  }
