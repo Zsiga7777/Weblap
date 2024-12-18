@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Document</title>
+</head>
+<body id="test">
+    <h1>Codewars felhasználók adatai</h1>
+    <div id ="inputField">
+    <form action="javascript:getUserName()" >
+        <label for="userName">Felhasználónév:</label>
+        <input type="text" id="userName">
+        <button type="submit"> submit</button>
+    </form>
+    <button onclick="userDataDelete()" >Lekért adatok törlése</button>
+    <button id="colorChanger" onclick="switchTheme()" >Sötét mód</button>
+</div>
+    <h2>Mentett felhasználók</h2>
+
+    <div id="userDatas">
+        
+    </div>
+   
+    <script src="script.js"></script>
+</body>
+</html>

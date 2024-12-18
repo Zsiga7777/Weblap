@@ -1,0 +1,84 @@
+.lightTheme
+{
+    border: 3px rgb(168, 122, 13) solid;
+    background-color: rgb(233, 173, 20);
+    color: black;
+}
+
+button.lightTheme{
+    background-color: rgb(233, 187, 20);
+}
+body.lightTheme{
+    background-color: wheat;
+    border: 0;
+}
+
+.darkTheme
+{
+    border: 3px rgb(0, 0, 0) solid;
+    background-color: rgb(37, 37, 37);
+    color: white;
+}
+
+button.darkTheme{
+    background-color: rgb(30, 30, 30);
+}
+body.darkTheme{
+    border: 0;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    
+}
+
+#inputField{
+    border-radius: 20px;
+    width: 30%;
+    padding: 20px;
+    margin: 30px auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+#inputField>form{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+input 
+{
+    border-radius: 20px;
+    width: 80%;
+    height: 30px;
+}
+
+h1, h2{
+    margin: 30px auto;
+    width: fit-content;
+}
+
+#userDatas{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.card{
+    width: 250px;
+    padding: 10px;
+    border-radius: 20px;
+    margin: 20px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+button
+{
+    display: inline-block;
+    border-radius: 20px;
+    padding: 20px;
+    font-weight: bold;
+    margin: 10px auto 10px auto;
+}
+
