@@ -13,8 +13,8 @@ window.onload = function () {
     {
         document.getElementById("test").className = "lightTheme";
         document.getElementById("inputField").className = "lightTheme";
-        let gombok = document.getElementsByTagName("button")
-        for(let i = 0; i < gombok.length; i++)
+        let gombok = document.getElementsByTagName("input")
+        for(let i = 1; i < gombok.length; i++)
         {
             gombok[i].className ="lightTheme"
         }
@@ -23,8 +23,8 @@ window.onload = function () {
     {
         document.getElementById("test").className = "darkTheme";
         document.getElementById("inputField").className = "darkTheme";
-        let gombok = document.getElementsByTagName("button")
-        for(let i = 0; i < gombok.length; i++)
+        let gombok = document.getElementsByTagName("input")
+        for(let i = 1; i < gombok.length; i++)
         {
             gombok[i].className ="darkTheme"
         }
