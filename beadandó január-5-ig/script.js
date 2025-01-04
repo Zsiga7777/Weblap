@@ -84,7 +84,7 @@ function getData(userName) {
             localStorage.setItem("userNames", JSON.stringify(temp))
            }
             
-            alert('Hiba volt az adatok lekérésevl vagy hibás felhasználónév');
+            alert('Hiba volt az adatok lekérésével vagy hibás felhasználónév');
             
         });
 }
