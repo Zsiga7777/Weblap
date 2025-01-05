@@ -50,7 +50,7 @@ function getUserName(userName) {
         if (!JSON.parse(localStorage.getItem("userNames")).includes(userName)) {
             getData(userName)
 
-            const newUrl = `${window.location.pathname}?${userName}`;
+           const newUrl = `${window.location.pathname}?${userName}`;
             history.pushState(null, "", newUrl);
 
             let temp = JSON.parse(localStorage.getItem("userNames"));
