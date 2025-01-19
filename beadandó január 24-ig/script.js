@@ -9,7 +9,6 @@ chooseButtons.forEach(element => {
                 chosenType = i;
                 working.innerHTML == "";
                 working.style.display = "none";
-                feedback.innerHTML == "";
             }
         }
     })
@@ -17,23 +16,23 @@ chooseButtons.forEach(element => {
 
 
 async function getFunction(id, type) {
-    let result
+    let result;
     await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`)
         .then(response => response.json())
         .then(json => { result = json });
-    return result
+    return result;
 }
 
 async function getAllFunction(type) {
-    let result
+    let result;
     await fetch(`https://vvri.pythonanywhere.com/api/${type}`)
         .then(response => response.json())
         .then(json => { result = json });
-    return result
+    return result;
 }
 
 async function postFunction(test, type) {
-    let result
+    let result;
     await fetch(`https://vvri.pythonanywhere.com/api/${type}`, {
         method: "POST",
         body: test,
@@ -43,11 +42,11 @@ async function postFunction(test, type) {
     })
         .then(response => response.json())
         .then(json => result = json);
-    return result
+    return result;
 }
 
 async function putFunction(test, id, type) {
-    let result
+    let result;
     await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
         method: "PUT",
         body: test,
@@ -57,11 +56,11 @@ async function putFunction(test, id, type) {
     })
         .then(response => response.json())
         .then(json => result = json);
-    return result
+    return result;
 }
 
 async function patchFunction(test, id, type) {
-    let result
+    let result;
     await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
         method: "PATCH",
         body: test,
@@ -71,171 +70,255 @@ async function patchFunction(test, id, type) {
     })
         .then(response => response.json())
         .then(json => result = json);
-    return result
+    return result;
 }
 
 async function deleteFunction(id, type) {
-    let result
+    let result;
     await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
-        method: "DELETE"
+        method: "DELETE",
     })
-        .then(response => response.json())
-        .then(json => result = json)
-    return result
+        .then(response => result = response)
+    return result;
 }
 
-function addNewSomething() {
+async function addNewSomething() {
     if (chosenType == 0) {
-        addStudent()
+        await addStudent();
     }
     else {
-        addCourse()
+        await addCourse();
     }
 }
 
-function modifySomething() {
+async function modifySomething() {
     if (chosenType == 0) {
-        modifyStudent()
+        await modifyStudent();
     }
     else {
-        modifyCourse()
+        await modifyCourse();
+    }
+}
+async function deleteSomething() {
+    if (chosenType == 0) {
+        await deleteStudent();
+    }
+    else {
+        await deleteCourse();
     }
 }
 
 async function addStudent() {
     let courses = await getAllFunction("courses");
 
-    working.style.display = "flex"
-    working.innerHTML = "<label for='studentInput'>Új tanuló neve: </label><input type='text' id='studentInput'> "
-    working.innerHTML += "<label for='selectedCourse'>Tanuló tantárgya:</label> <select id='selectedCourse'> name='selectedCourse' </select>"
+    working.style.display = "flex";
+    working.innerHTML = "<label for='studentInput'>Új tanuló neve: </label><input type='text' id='studentInput'> ";
+    working.innerHTML += "<label for='selectedCourse'>Tanuló tantárgya:</label> <select id='selectedCourse'> name='selectedCourse' </select>";
 
-    select = document.getElementById("selectedCourse")
+    select = document.getElementById("selectedCourse");
 
-    courses.forEach(element => {
-        select.innerHTML += `<option value='${element.id}'> ${element.name} </option>`
-    });
+    writeSelectMenu(select, courses);
 
-    working.innerHTML += "<button onclick='saveStudent()'>Új tanuló mentése</button>"
+    working.innerHTML += "<button onclick='saveStudent()'>Új tanuló mentése</button>";
 }
 
 async function saveStudent() {
-    let newName = document.getElementById("studentInput").value;
-    let selectedCourse = document.getElementById("selectedCourse").value
-    if (newName == null) {
-        alert("Adjon meg nevet!")
-        return
+    let newName = document.getElementById("studentInput").value.trim();
+    let selectedCourse = document.getElementById("selectedCourse").value;
+    if (newName == "") {
+        alert("Adjon meg nevet!");
+        return;
     }
-    let newStudent = { name: newName, course_id: selectedCourse }
-    let response = await postFunction(JSON.stringify(newStudent), "students")
+    let newStudent = { name: newName, course_id: selectedCourse };
+    let response = await postFunction(JSON.stringify(newStudent), "students");
 
     if (response.name == newName) {
-        alert("A tanuló sikeresen hozzáadásra került.")
+        alert("A tanuló sikeresen hozzáadásra került.");
     }
     else {
-        alert("A tanuló már létezett, vagy valami hiba történt")
+        alert("A tanuló már létezett, vagy valami hiba történt");
     }
-    working.style.display = "none"
+    working.style.display = "none";
 }
 
 async function addCourse() {
-    working.style.display = "flex"
-    working.innerHTML = "<label for='courseInput'>Új kurzus neve: </label><input type='text' id='courseInput'> "
+    working.style.display = "flex";
+    working.innerHTML = "<label for='courseInput'>Új kurzus neve: </label><input type='text' id='courseInput'> ";
 
-    working.innerHTML += "<button onclick='saveCourse()'>Új kurzus mentése</button>"
+    working.innerHTML += "<button onclick='saveCourse()'>Új kurzus mentése</button>";
 
 }
 
 async function saveCourse() {
-    let newName = document.getElementById("courseInput").value;
+    let newName = document.getElementById("courseInput").value.trim();
 
-    if (newName == null) {
-        alert("Adjon meg nevet!")
-        return
+    if (newName == "") {
+        alert("Adjon meg nevet!");
+        return;
     }
-    let newCourse = { name: newName }
-    let response = await postFunction(JSON.stringify(newCourse), "courses")
+    let newCourse = { name: newName };
+    let response = await postFunction(JSON.stringify(newCourse), "courses");
 
     if (response.name == newName) {
-        alert("A kurzus sikeresen hozzáadásra került.")
+        alert("A kurzus sikeresen hozzáadásra került.");
     }
     else {
-        alert("A kurzus már létezett, vagy valami hiba történt")
+        alert("A kurzus már létezett, vagy valami hiba történt");
     }
-    working.style.display = "none"
+    working.style.display = "none";
 }
 
 async function modifyStudent() {
     let students = await getAllFunction("students");
 
-    working.style.display = "flex"
-    working.innerHTML = "<label for='selectedStudent'>Tanulók:</label> <select id='selectedStudent'> name='selectedStudent' </select>"
-    working.innerHTML += "<label for='studentInput'>tanuló új neve: </label><input type='text' id='studentInput'> "
+    working.style.display = "flex";
+    working.innerHTML = "<label for='selectedStudent'>Tanulók:</label> <select id='selectedStudent'> name='selectedStudent' </select>";
+    working.innerHTML += "<label for='studentInput'>tanuló új neve: </label><input type='text' id='studentInput'> ";
 
-    select = document.getElementById("selectedStudent")
+    select = document.getElementById("selectedStudent");
+    writeSelectMenu(select, students);
 
-    students.forEach(element => {
-        select.innerHTML += `<option value='${element.id}'> ${element.name} </option>`
-    });
+    working.innerHTML += "<label for='selectDifferentCourse'>kurzusok:</label> <select id='selectDifferentCourse'> name='selectDifferentCourse' </select>";
 
-    working.innerHTML += "<button onclick='saveModifiedStudent()'>tanuló módosításának mentése</button>"
+    let courseSelect = document.getElementById("selectDifferentCourse");
+    let courses = await getAllFunction("courses");
+    courses.unshift({ id: -1, name: "Nincs kiválasztva kurzus" });
+    writeSelectMenu(courseSelect, courses);
+
+    working.innerHTML += "<button onclick='saveModifiedStudent()'>tanuló módosításának mentése</button>";
 }
 async function saveModifiedStudent() {
-    let newName = document.getElementById("studentInput").value;
-    let selectedStudent = document.getElementById("selectedStudent").value
-
-    if (newName == null) {
-        alert("Adjon meg nevet!")
-        return
+    let newName = document.getElementById("studentInput").value.trim();
+    let selectedStudentId = document.getElementById("selectedStudent").value;
+    let newCourseId = document.getElementById("selectDifferentCourse").value;
+    let selectedStudent = await getFunction(selectedStudentId, "students");
+    if (newName == "") {
+        newName = selectedStudent.name;
     }
-    let modifiedStudent = { name: newName, course_id: selectedStudent }
-    let response = await putFunction(JSON.stringify(modifiedStudent), selectedStudent, "students")
+
+    if (newCourseId == -1) {
+        newCourseId = await getCourseIdfroStudent(selectedStudent);
+    }
+
+    let modifiedStudent = { name: newName, course_id: newCourseId };
+    let response = await putFunction(JSON.stringify(modifiedStudent), selectedStudentId, "students");
 
     if (response.name == newName) {
-        alert("A tanuló sikeresen módosítva került.")
+        alert("A tanuló sikeresen módosítva került.");
     }
     else {
-        alert("A tanuló nem került módosításra, vagy valami hiba történt")
+        alert("A tanuló nem került módosításra, vagy valami hiba történt");
     }
-    working.style.display = "none"
+    working.style.display = "none";
+}
+
+async function getCourseIdfroStudent(studentSearched) {
+    let courseId;
+    let courses = await getAllFunction("courses");
+    courses.forEach(course => {
+        course.students.forEach(student => {
+            if (student.name == studentSearched.name) {
+                courseId = course.id;
+
+            }
+        }
+        )
+    })
+    return courseId;
 }
 
 async function modifyCourse() {
     let courses = await getAllFunction("courses");
 
-    working.style.display = "flex"
-    working.innerHTML = "<label for='selectedCourse'>Kurzusok:</label> <select id='selectedCourse'> name='selectedCourse' </select>"
-    working.innerHTML += "<label for='courseInput'>kurzus új neve: </label><input type='text' id='courseInput'> "
+    working.style.display = "flex";
+    working.innerHTML = "<label for='selectedCourse'>Kurzusok:</label> <select id='selectedCourse'> name='selectedCourse' </select>";
+    working.innerHTML += "<label for='courseInput'>kurzus új neve: </label><input type='text' id='courseInput'> ";
 
-    select = document.getElementById("selectedCourse")
+    select = document.getElementById("selectedCourse");
+    writeSelectMenu(select, courses);
 
-    courses.forEach(element => {
-        select.innerHTML += `<option value='${element.id}'> ${element.name} </option>`
-    });
-
-    working.innerHTML += "<button onclick='saveModifiedCourse()'>kurzus módosításának mentése</button>"
+    working.innerHTML += "<button onclick='saveModifiedCourse()'>kurzus módosításának mentése</button>";
 
 }
-async function saveModifiedCourse() {
-    let newName = document.getElementById("courseInput").value;
-    let selectedCourse = document.getElementById("selectedCourse").value
 
-    if (newName == null) {
-        alert("Adjon meg nevet!")
-        return
+async function saveModifiedCourse() {
+    let newName = document.getElementById("courseInput").value.trim();
+    let selectedCourseId = document.getElementById("selectedCourse").value;
+
+    if (newName == "") {
+        return;
     }
-    let modifiedCourse = { name: newName }
-    let response = await patchFunction(JSON.stringify(modifiedCourse), selectedCourse, "courses")
+
+    let modifiedCourse = { name: newName };
+    let response = await patchFunction(JSON.stringify(modifiedCourse), selectedCourseId, "courses");
 
     if (response.name == newName) {
-        alert("A kurzus sikeresen módosításra került.")
+        alert("A kurzus sikeresen módosításra került.");
     }
     else {
-        alert("A tanuló nem került módosításra, vagy valami hiba történt")
+        alert("A tanuló nem került módosításra, vagy valami hiba történt");
     }
 
-    working.style.display = "none"
+    working.style.display = "none";
 }
 
-function deleteStudent() { }
+function writeSelectMenu(parent, list) {
+    list.forEach(element => {
+        parent.innerHTML += `<option value='${element.id}'> ${element.name} </option>`;
+    });
+}
 
-function deleteCourse() { }
+
+async function deleteStudent() {
+    let students = await getAllFunction("students");
+
+    working.style.display = "flex";
+    working.innerHTML = "<label for='selectedStudent'>Tanulók:</label> <select id='selectedStudent'> name='selectedStudent' </select>";
+
+    select = document.getElementById("selectedStudent");
+
+    writeSelectMenu(select, students);
+
+    working.innerHTML += "<button onclick='saveDeletedStudent()'>tanuló törlése</button>";
+}
+
+async function saveDeletedStudent() {
+    let selectedStudent = document.getElementById("selectedStudent").value;
+
+    let response = await deleteFunction(selectedStudent, "students");
+
+    if (response.ok == true) {
+        alert("A tanuló sikeresen törlésre került.");
+    }
+    else {
+        alert("A tanuló nem került törlésre, vagy valami hiba történt");
+    }
+    working.style.display = "none";
+}
+
+async function deleteCourse() {
+    let courses = await getAllFunction("courses");
+
+    working.style.display = "flex";
+    working.innerHTML = "<label for='selectedCourse'>Kurzusok:</label> <select id='selectedCourse'> name='selectedCourse' </select>";
+
+    select = document.getElementById("selectedCourse");
+
+    writeSelectMenu(select, courses);
+
+    working.innerHTML += "<button onclick='saveDeletedCourse()'>kurzus törlése</button>";
+}
+
+async function saveDeletedCourse() {
+    let selectedCourse = document.getElementById("selectedCourse").value;
+
+    let response = await deleteFunction(selectedCourse, "courses");
+
+    if (response.ok == true) {
+        alert("A kurzus sikeresen törlésre került.");
+    }
+    else {
+        alert("A kurzus nem került törlésre, vagy valami hiba történt");
+    }
+    working.style.display = "none";
+}
