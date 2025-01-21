@@ -16,70 +16,140 @@ chooseButtons.forEach(element => {
 
 
 async function getFunction(id, type) {
-    let result;
-    await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`)
-        .then(response => response.json())
-        .then(json => { result = json });
-    return result;
+    try {
+        const res = await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`);
+           const data =await res.json();
+   
+           if(!res.ok)
+           {
+               console.log(data.description);
+               return;
+           }
+   
+           return data;
+       }
+       catch(error)
+       {
+           console.log(error);
+       }
 }
 
 async function getAllFunction(type) {
-    let result;
-    await fetch(`https://vvri.pythonanywhere.com/api/${type}`)
-        .then(response => response.json())
-        .then(json => { result = json });
-    return result;
+    try {
+        const res = await fetch(`https://vvri.pythonanywhere.com/api/${type}`);
+           const data =await res.json();
+   
+           if(!res.ok)
+           {
+               console.log(data.description);
+               return;
+           }
+   
+           return data;
+       }
+       catch(error)
+       {
+           console.log(error);
+       }
 }
 
 async function postFunction(test, type) {
-    let result;
-    await fetch(`https://vvri.pythonanywhere.com/api/${type}`, {
-        method: "POST",
-        body: test,
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    })
-        .then(response => response.json())
-        .then(json => result = json);
-    return result;
+    try {
+        const res = await fetch(`https://vvri.pythonanywhere.com/api/${type}`, {
+           method: 'POST',
+           headers:
+           {
+                "Content-type": "application/json; charset=UTF-8"
+           },
+           body: test,
+        });
+           const data = await res.json();
+   
+           if(!res.ok)
+           {
+               console.log(data.description);
+               return;
+           }
+   
+           return data;
+       }
+       catch(error)
+       {
+           console.log(error);
+       }
 }
 
 async function putFunction(test, id, type) {
-    let result;
-    await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
-        method: "PUT",
-        body: test,
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    })
-        .then(response => response.json())
-        .then(json => result = json);
-    return result;
+    try {
+        const res = await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
+           method: 'PUT',
+           headers:
+           {
+                "Content-type": "application/json; charset=UTF-8"
+           },
+           body:test,
+        });
+           const data = await res.json();
+   
+           if(!res.ok)
+           {
+               console.log(data.description);
+               return;
+           }
+   
+           return data;
+       }
+       catch(error)
+       {
+           console.log(error);
+       }
 }
 
 async function patchFunction(test, id, type) {
-    let result;
-    await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
-        method: "PATCH",
-        body: test,
-        headers: {
-            "Content-type": "application/json; charset=UTF-8"
-        }
-    })
-        .then(response => response.json())
-        .then(json => result = json);
-    return result;
+    try {
+        const res = await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
+           method: 'PATCH',
+           headers:
+           {
+                "Content-type": "application/json; charset=UTF-8"
+           },
+           body: test,
+        });
+           const data = await res.json();
+   
+           if(!res.ok)
+           {
+               console.log(data.description);
+               return;
+           }
+   
+           return data;
+       }
+       catch(error)
+       {
+           console.log(error);
+       }
 }
 
 async function deleteFunction(id, type) {
-    let result;
-    await fetch(`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
-        method: "DELETE",
-    })
-        .then(response => result = response)
-    return result;
+    try {
+        const res = await fetch (`https://vvri.pythonanywhere.com/api/${type}/${id}`, {
+          method: 'DELETE'
+        });
+           const data =await res.json();
+   
+           if(!res.ok)
+           {
+               console.log(data.description);
+               return;
+           }
+   
+           return data;
+       }
+       catch(error)
+       {
+           console.log(error);
+       }
 }
 
 async function addNewSomething() {
@@ -132,7 +202,7 @@ async function saveStudent() {
     let newStudent = { name: newName, course_id: selectedCourse };
     let response = await postFunction(JSON.stringify(newStudent), "students");
 
-    if (response.name == newName) {
+    if (response != undefined) {
         alert("A tanuló sikeresen hozzáadásra került.");
     }
     else {
@@ -159,7 +229,7 @@ async function saveCourse() {
     let newCourse = { name: newName };
     let response = await postFunction(JSON.stringify(newCourse), "courses");
 
-    if (response.name == newName) {
+    if (response != undefined) {
         alert("A kurzus sikeresen hozzáadásra került.");
     }
     else {
@@ -203,7 +273,7 @@ async function saveModifiedStudent() {
     let modifiedStudent = { name: newName, course_id: newCourseId };
     let response = await putFunction(JSON.stringify(modifiedStudent), selectedStudentId, "students");
 
-    if (response.name == newName) {
+    if (response != undefined) {
         alert("A tanuló sikeresen módosítva került.");
     }
     else {
@@ -252,7 +322,7 @@ async function saveModifiedCourse() {
     let modifiedCourse = { name: newName };
     let response = await patchFunction(JSON.stringify(modifiedCourse), selectedCourseId, "courses");
 
-    if (response.name == newName) {
+    if (response!= undefined) {
         alert("A kurzus sikeresen módosításra került.");
     }
     else {
@@ -287,7 +357,7 @@ async function saveDeletedStudent() {
 
     let response = await deleteFunction(selectedStudent, "students");
 
-    if (response.ok == true) {
+    if (response == undefined) {
         alert("A tanuló sikeresen törlésre került.");
     }
     else {
@@ -314,7 +384,7 @@ async function saveDeletedCourse() {
 
     let response = await deleteFunction(selectedCourse, "courses");
 
-    if (response.ok == true) {
+    if (response == undefined) {
         alert("A kurzus sikeresen törlésre került.");
     }
     else {
