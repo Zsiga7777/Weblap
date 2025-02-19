@@ -2,7 +2,7 @@ import express from 'express'
 
 const app = express();
 app.use(express.json())
-const users = [
+let users = [
     { firstName: "Harry", lastName: "Potter" },
     { firstName: "Ronald", lastName: "Bilius Weasley" },
     { firstName: "Hermione", lastName: "Jean Granger" },
@@ -34,7 +34,6 @@ app.post('/users', (req, res) =>{
 app.put('/users/:id', (req, res) =>{
     const id =req.params.id;
     const {firstName, lastName} = req.body
-
     if(id < users.length && id >= 0)
     {
        users[id] = {firstName, lastName}
@@ -83,18 +82,20 @@ app.patch('/users/:id', (req, res) =>{
 })
 app.delete('/users/:id', (req, res) =>{
     const id =req.params.id;
-    let user
+    let user = {};
     if(id < users.length && id >= 0)
     {
         user = users[id];
-        users = users.filter(user);
+       users = users.filter(checkUser);
         res.json({message: "Delete successful" })
     }
     else
     {
         res.json({message: "User not found" })
     }
-   
+    function checkUser(input) {
+        return input !=  user;
+      }
 })
 
 app.listen(3010, () => {
