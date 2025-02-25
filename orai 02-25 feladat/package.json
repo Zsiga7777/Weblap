@@ -1,0 +1,21 @@
+{
+  "name": "orai-02-25-feladat",
+  "version": "1.0.0",
+  "main": "cars.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node cars.js",
+    "dev": "nodemon cars.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
