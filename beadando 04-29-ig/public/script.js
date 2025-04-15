@@ -129,7 +129,7 @@ function createList() {
     let listString = "";
     listString += "<ol>"
     for (let i = 0; i < albums.length; i++) {
-        listString += `<li Id=${i}>${albums[i].name}</li>`;
+        listString += `<li id=${albums[i].id}>${albums[i].name}</li>`;
     }
 
     albumList.innerHTML = listString
@@ -152,23 +152,32 @@ async function writeInformation() {
         {
             datas.innerHTML="";
         }
+        let album ;
+        for(let i = 0; i< albums.length; i++)
+        {
+            if(albums[i].id == selectedAlbumId)
+            {
+                album = albums[i];
+                break;
+            }
+        }
     datas.innerHTML += `
             <button id="back" onclick="closeInformation()"> Vissza </button>
-    <p>album neve: ${albums[selectedAlbumId].name}</p>
-    <p>bande neve: ${albums[selectedAlbumId].band}</p>
-    <p>album zenéinek száma: ${albums[selectedAlbumId].numberOfSongs} darab</p>
-    <p>album hossza: ${albums[selectedAlbumId].length} perc</p></p>
+    <p>album neve: ${album.name}</p>
+    <p>bande neve: ${album.band}</p>
+    <p>album zenéinek száma: ${album.numberOfSongs} darab</p>
+    <p>album hossza: ${album.length} perc</p></p>
         <p id='updateField'><label for="albumNameInput" class="inputLabel">Album neve:</label>
-            <input type="text" id="albumNameInput" value='${albums[selectedAlbumId].name}'>
+            <input type="text" id="albumNameInput" value='${album.name}'>
             <br>
             <label for="bandNameInput" class="inputLabel" >Banda neve:</label>
-            <input type="text" id="BandNameInput" value='${albums[selectedAlbumId].band}'>
+            <input type="text" id="BandNameInput" value='${album.band}'>
 <br>
             <label for="numberOfSongsInput" class="inputLabel" >zeneszámok száma:</label>
-            <input type="number" id="numberOfSongsInput" min="1" value='${albums[selectedAlbumId].numberOfSongs}'>
+            <input type="number" id="numberOfSongsInput" min="1" value='${album.numberOfSongs}'>
 <br>
             <label for="lengthInput" class="inputLabel" >hossza:</label>
-            <input type="number" id="lengthInput" min="1" value='${albums[selectedAlbumId].length}'>
+            <input type="number" id="lengthInput" min="1" value='${album.length}'>
 <br>
             <p id="message"></p>
     <button id="albumUpdateButton" onclick="updateAlbum()">Album módosítása</button> <button id="albumDeleteButton" onclick="deleteAlbum()">Album törlése</button>` 
@@ -209,12 +218,19 @@ const length = document.getElementById("lengthInput").value
 }
 
 async function deleteAlbum() {
-    await deleteFunction(parseInt(selectedAlbumId)+1);
+    await deleteFunction(parseInt(selectedAlbumId));
     datas.innerHTML = "";
         information.style.display = "none";
     albums = await getAllFunction();
-
+    if(albums.length == 0)
+    {
+        albumList.style.display = "none"
+        addButton.style.display = "block"
+    }
+    else
+    {
    createList()
+}
 }
 
 async function updateAlbum() {
@@ -230,7 +246,7 @@ async function updateAlbum() {
             "numberOfSongs": parseInt(numberOfSongs),
             "length" : parseInt(length)
         }
-        await putFunction(JSON.stringify(test), selectedAlbumId+1);
+        await putFunction(JSON.stringify(test), selectedAlbumId);
         albums = await getAllFunction();
         datas.innerHTML = "";
         information.style.display = "none";
@@ -244,9 +260,21 @@ async function updateAlbum() {
 
 function closeInformation()
 {
+    if(albums.length == 0)
+    {
+        albumList.style.display = "none"
+        datas.innerHTML = "";
+        addField.style.display = "none"
+        information.style.display = "none";
+        addButton.style.display = "block"
+        
+    }
+    else
+    {
     createList()
     datas.innerHTML = "";
     addField.style.display = "none"
     information.style.display = "none";
+    }
 }
 

@@ -5,7 +5,7 @@
 }
 
 body{
-    background-color: wheat;
+    background-color: #f4dd79;
     font-weight: bold;
 }
 
@@ -28,7 +28,7 @@ input{
 
 button{
     display: block;
-    background-color:rgb(94, 216, 247) ;
+    background-color:#f4d179 ;
     padding: 10px;
     border-radius: 20px;
     font-weight: bold;
@@ -45,13 +45,13 @@ button{
 #lista, #addAlbum, #information{
     margin: auto;
     max-width: fit-content;
-    background-color: rgb(243, 187, 83);
+    background-color: #f4e979;
     padding: 20px;
     border-radius: 20px;
 }
 
 #updateField{
-    background-color: rgb(250, 179, 47);
+    background-color: #f4e979;
     padding: 10px;
     border-radius: 20px;
 }
