@@ -260,7 +260,7 @@ async function updateAlbum() {
 
 function closeInformation()
 {
-    if(albums.length == 0)
+    if(albums.length == null || albums.length == 0)
     {
         albumList.style.display = "none"
         datas.innerHTML = "";
