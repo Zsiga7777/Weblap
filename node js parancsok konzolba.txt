@@ -3,4 +3,5 @@ npm i express
 npm i nodemon --save-dev
 npm i sqlite3    
 npm i cors
+npm i better-sqlite3  
 npm run dev
