@@ -14,7 +14,6 @@ export const getUser = (id) => db
 export const saveUser = (name, age) => db
     .prepare('INSERT INTO users (name, age) VALUES (?,?)').run(name, age)
 
-
 export const updateUser = (id, name, age) => db
     .prepare('UPDATE users SET name = ?, age = ? WHERE id = ?').run(name, age, id)
 
