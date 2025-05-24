@@ -1,38 +1,119 @@
-*{
+/* Alapstílusok */
+body {
+    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
-body{
-    font-weight: bold;
-}
-
-h1{
-    margin: 20px 0px;
+h1 {
     text-align: center;
+    color: #005f73;
 }
 
-.inputLabel{
-    margin: 20px auto 5px;
-    max-width: fit-content;
-    font-size: large;
+/* Menü */
+ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
 }
 
-input{
-    margin: 5px auto;
-    padding: 10px;
-    border-radius: 20px;
+ul li {
+    background-color: #0a9396;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-button{
+ul li:hover {
+    background-color: #007f87;
+}
+
+/* Input mezők és űrlap elemek */
+input[type="text"],
+select {
     display: block;
-    background-color:#f4d179 ;
-    padding: 10px;
-    border-radius: 20px;
+    width: 100%;
+    max-width: 500px;
+    padding: 0.5rem;
+    margin: 0.5rem auto;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button {
+    background-color: #94d2bd;
+    border: none;
+    color: #003845;
+    padding: 0.6rem 1.2rem;
+    margin-top: 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #72b8a4;
+}
+
+/* Tartalom megjelenítés */
+#tartalom {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Blog lista */
+.lista {
+    background-color: #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.lista p {
+    margin: 0.4rem 0;
+}
+
+/* Gombok bloghoz */
+.lista button {
+    margin-right: 0.5rem;
+}
+
+/* Üzenetek */
+#message {
+    color: #d00000;
+    text-align: center;
     font-weight: bold;
-    margin: 10px auto;
-    box-shadow:2px 2px rgba(60, 60, 60, 0.401);
+}
+
+/* Reszponzivitás */
+@media screen and (max-width: 600px) {
+    ul {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    ul li {
+        width: 80%;
+        text-align: center;
+    }
+
+    .lista {
+        padding: 0.8rem;
+    }
+
+    input[type="text"],
+    select {
+        width: 90%;
+    }
 }
 
 #message{
@@ -42,40 +123,3 @@ button{
     font-size: larger;
 }
 
-#lista, #addAlbum, #information{
-    margin: auto;
-    max-width: fit-content;
-    background-color: #f4e979;
-    padding: 20px;
-    border-radius: 20px;
-    border: 2px black solid;
-    box-shadow:2px 2px rgba(60, 60, 60, 0.401);
-}
-
-#updateField{
-    background-color: #f4e979;
-    padding: 10px;
-    border-radius: 20px;
-}
-
-li{
-    border-radius: 20px;
-    border: black 2px solid;
-    padding: 10px;
-    margin: 10px;
-    list-style-position: inside;
-}
-
-.data{
-    border-radius: 20px;
-    border: black 2px solid;
-    padding: 10px;
-    margin: 10px;
-}
-
-@media screen and (max-width: 500px) {
-    input{
-        display: block;
-        margin: auto;
-    }
-  }

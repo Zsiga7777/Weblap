@@ -1,29 +1,17 @@
 import express from 'express'
 import * as db from "./util/database.js"
+import cors from "cors";
 
-const PORT = 5000
+const PORT = 3000
 const app = express()
 app.use(express.json())
+
+app.use(cors())
 
 app.get("/users", (req, res) => {
     try{
         const users = db.getUsers()
     res.status(200).json(users)
-    }
-    catch(err)
-    {
-        res.status(500).json({message : `${err}`})
-    }
-})
-
-app.get("/users/:id", (req, res) => {
-    try{
-        const user = db.getUser(req.params.id)
-        if(!user)
-        {
-            return res.status(404).json({message: "user not found"})
-        }
-        res.status(200).json(user);
     }
     catch(err)
     {
@@ -74,7 +62,8 @@ app.put("/users/:id", (req, res) => {
 
 app.delete("/users/:id", (req, res) => {
     try{
-        const deleteUser = db.deleteUser(req.params.id)
+        const id = +req.params.id
+        const deleteUser = db.deleteUser(id)
         if(deleteUser.changes != 1)
         {
             return res.status(501).json({message: "User delete falied"})
@@ -91,21 +80,6 @@ app.get("/blogs", (req, res) => {
     try{
         const blogs = db.getBlogs()
     res.status(200).json(blogs)
-    }
-    catch(err)
-    {
-        res.status(500).json({message : `${err}`})
-    }
-})
-
-app.get("/blogs/:id", (req, res) => {
-    try{
-        const blog = db.getBlog(req.params.id)
-        if(!blog)
-        {
-            return res.status(404).json({message: "blog not found"})
-        }
-        res.status(200).json(user);
     }
     catch(err)
     {
@@ -141,7 +115,7 @@ app.put("/blogs/:id", (req, res) => {
             return res.status(400).json({message: "Invalid credentials"})
         }
         const id = +req.params.id
-        const updatedBlog = db.updateBlog(userId, title,category,content,created, lastModified, id)
+        const updatedBlog = db.updateBlog(id, userId, title,category,content,created, lastModified)
         if(updatedBlog.changes != 1)
         {
             return res.status(501).json({message: "Blog update falied"})
@@ -156,7 +130,8 @@ app.put("/blogs/:id", (req, res) => {
 
 app.delete("/blogs/:id", (req, res) => {
     try{
-        const deleteBlog = db.deleteUser(req.params.id)
+         const id = +req.params.id
+        const deleteBlog = db.deleteBlog(id)
         if(deleteBlog.changes != 1)
         {
             return res.status(501).json({message: "Blog delete falied"})
