@@ -1,125 +1,126 @@
-/* Alapstílusok */
-body {
-    font-family: Arial, sans-serif;
+* {
+    box-sizing: border-box;
     margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #f4f4f4;
     padding: 1rem;
-    background-color: #f9f9f9;
     color: #333;
 }
 
+/* Fejléc */
 h1 {
     text-align: center;
-    color: #005f73;
+    margin-bottom: 1rem;
+    color: #004d7a;
 }
 
 /* Menü */
 ul {
-    list-style-type: none;
-    padding: 0;
+    list-style: none;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 2rem;
 }
 
 ul li {
-    background-color: #0a9396;
+    background-color: #0077b6;
     color: white;
-    padding: 0.75rem 1.5rem;
+    padding: 0.6rem 1.2rem;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
 ul li:hover {
-    background-color: #007f87;
+    background-color: #005f87;
 }
 
-/* Input mezők és űrlap elemek */
+/* Tartalom terület */
+#tartalom {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Form elemek */
 input[type="text"],
+input[type="number"],
+input[type="date"],
 select {
-    display: block;
     width: 100%;
     max-width: 500px;
     padding: 0.5rem;
-    margin: 0.5rem auto;
+    margin: 0.6rem auto;
+    display: block;
     border: 1px solid #ccc;
     border-radius: 6px;
+    font-size: 1rem;
 }
 
+/* Gombok */
 button {
-    background-color: #94d2bd;
+    background-color: #90e0ef;
+    color: #023e8a;
     border: none;
-    color: #003845;
     padding: 0.6rem 1.2rem;
     margin-top: 1rem;
-    cursor: pointer;
     border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
     transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #72b8a4;
+    background-color: #48cae4;
 }
 
-/* Tartalom megjelenítés */
-#tartalom {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-/* Blog lista */
+/* Listaelemek */
 .lista {
-    background-color: #e9ecef;
-    border-radius: 8px;
+    background-color: #edf6f9;
     padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-top: 1rem;
+    border-left: 4px solid #00b4d8;
+    border-radius: 6px;
 }
 
 .lista p {
-    margin: 0.4rem 0;
-}
-
-/* Gombok bloghoz */
-.lista button {
-    margin-right: 0.5rem;
+    margin: 0.5rem 0;
 }
 
 /* Üzenetek */
 #message {
     color: #d00000;
     text-align: center;
+    margin-top: 1rem;
     font-weight: bold;
 }
 
-/* Reszponzivitás */
-@media screen and (max-width: 600px) {
+/* Mobil nézet */
+@media (max-width: 600px) {
     ul {
         flex-direction: column;
         align-items: center;
     }
 
     ul li {
-        width: 80%;
+        width: 90%;
         text-align: center;
     }
 
-    .lista {
+    #tartalom {
         padding: 0.8rem;
     }
 
-    input[type="text"],
-    select {
+    input, select {
         width: 90%;
     }
 }
-
-#message{
-    color: rgb(189, 9, 9);
-    text-align: center;
-    margin-top: 10px;
-    font-size: larger;
-}
-

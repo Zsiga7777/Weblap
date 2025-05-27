@@ -163,6 +163,7 @@ app.post("/bills", (req, res) => {
             return res.status(400).json({message: "Invalid credentials"})
         }
         const savedBill = db.saveBill(sellerId, buyerId,billNumber,created,payDay, deadline, total, afa)
+
         if(savedBill.changes != 1)
         {
             return res.status(501).json({message: "Bill save falied"})

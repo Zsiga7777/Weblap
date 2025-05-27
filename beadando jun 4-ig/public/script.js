@@ -377,6 +377,7 @@ async function loadPersonSelect() {
     }
     loadPerson.innerHTML += `<label for='name'>név:</label> <input type='text' id='name' value='${person.name}'>`
     loadPerson.innerHTML += `<label for='address'>lakcím:</label> <input type='text' id='address' value='${person.address}'>`
+    loadPerson.innerHTML += `<label for='taxNumber'>adószám(például:11111111-1-11):</label> <input type='text' id='taxNumber' placeholder='11111111-1-11' value='${person.taxNumber}'>`
     loadPerson.innerHTML += "<button id='submit' onclick='saveUpdatedPerson()'>személy mentése</button>"
     selectedPerson = person
 }
@@ -387,15 +388,15 @@ async function saveUpdatedPerson() {
     }
     const name = document.getElementById("name").value.trim();
     const address = document.getElementById("address").value.trim();
+    const taxNumber = document.getElementById("taxNumber").value.trim();
 
     buyers = await getAllBuyerFunction();
     sellers = await getAllSellerFunction();
     if (name != undefined && name.length > 0 && address != undefined && address.length > 0) {
 
-        let test = {
-            "name": `${name}`,
-            "address": `${address}`,
-            "taxNumber": `${selectedPerson.taxNumber}`
+if (taxNumber.length != 13 || !taxNumberRegex.test(taxNumber)) {
+            document.getElementById("message").innerHTML = "Adjon helyes adószámot!"
+            return
         }
         let type;
         for (const buyer of buyers) {
@@ -410,6 +411,29 @@ async function saveUpdatedPerson() {
 
             }
         }
+        for (const buyer of buyers) {
+            if (buyer.taxNumber == taxNumber && selectedPerson.id == buyer.id && type == "buyer") {break}
+            else if(buyer.taxNumber == taxNumber)
+            {
+                document.getElementById("message").innerHTML = "ilyen adószám már létezik!"
+                return
+            }
+        }
+        for (const seller of sellers) {
+            if (seller.taxNumber == taxNumber && selectedPerson.id == seller.id && type == "seller") {break}
+            else if(seller.taxNumber == taxNumber)
+            {
+                document.getElementById("message").innerHTML = "ilyen adószám már létezik!"
+                return
+            }
+        }
+
+        let test = {
+            "name": `${name}`,
+            "address": `${address}`,
+            "taxNumber": `${taxNumber}`
+        }
+        
         if (type == "buyer") {
             await putBuyerFunction(JSON.stringify(test), selectedPerson.id);
         }
@@ -609,9 +633,9 @@ async function saveBill() {
             document.getElementById("message").innerHTML = "Nem lehet a határidő után befizetni!"
             return
         }
-        const dateStringCreated = `${created.getFullYear()}.${created.getMonth()}.${created.getDate()}`
-        const dateStringDeadline= `${deadline.getFullYear()}.${deadline.getMonth()}.${deadline.getDate()}`
-        const dateStringPayDay = `${payDay.getFullYear()}.${payDay.getMonth()}.${payDay.getDate()}`
+        const dateStringCreated = `${created.getFullYear()}-${created.getMonth()>9 ? created.getMonth() : "0"+created.getMonth()}-${created.getDate()>9 ? created.getDate() : "0"+created.getDate()}`
+        const dateStringDeadline= `${deadline.getFullYear()}-${deadline.getMonth()>9 ? deadline.getMonth() : "0"+deadline.getMonth()}-${deadline.getDate()>9 ? deadline.getDate() : "0"+deadline.getDate()}`
+        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()>9 ? payDay.getMonth() : "0"+payDay.getMonth()}-${payDay.getDate()>9 ? payDay.getDate() : "0"+payDay.getDate()}`
         let test = {
             "sellerId": sellerId,
             "buyerId": buyerId,
@@ -630,19 +654,28 @@ async function saveBill() {
     }
 }
 
-async function listBlogs() {
+async function listBills() {
     tartalom.innerHTML = ""
-    users = await getAllUserFunction();
-    blogs = await getAllBillsFunction();
-    if (blogs.length == 0) {
-        tartalom.innerHTML = "<p id='message'> Nincs blog!</p>"
+    buyers = await getAllBuyerFunction();
+    sellers = await getAllSellerFunction()
+    bills = await getAllBillsFunction();
+     let selectedBuyer
+        let selectedSeller
+    if (bills.length == 0) {
+        tartalom.innerHTML = "<p id='message'> Nincs számmla!</p>"
         return
     }
-    for (let i = 0; i < blogs.length; i++) {
-        let selectedUser
-        for (const user of users) {
-            if (user.id == blogs[i].userId) {
-                selectedUser = user
+    for (const bill of bills) {
+       
+        for (const buyer of buyers) {
+            if (buyer.id == bill.buyerId) {
+                selectedBuyer = buyer
+                break
+            }
+        }
+        for (const seller of sellers) {
+            if (seller.id == bill.sellerId) {
+                selectedSeller = seller
                 break
             }
         }
@@ -650,77 +683,141 @@ async function listBlogs() {
         tartalom.innerHTML += `<div class='lista' >`
         let elemSzam = document.getElementsByClassName('lista').length
         const elem = document.getElementsByClassName('lista')[elemSzam - 1]
-        elem.innerHTML += `<p> felhasználó: ${selectedUser.name}</p>`
-        elem.innerHTML += `<p> cím: ${blogs[i].title}</p>`
-        elem.innerHTML += `<p> kategória: ${blogs[i].category}</p>`
-        elem.innerHTML += `<p> készítve: ${blogs[i].created}</p>`
-        elem.innerHTML += `<p> utoljára módosítva: ${blogs[i].lastModified}</p>`
-        elem.innerHTML += `<p> tartalma: ${blogs[i].content}</p>`
-        elem.innerHTML += `<button class='modify' onclick='updateBlog()' value='${blogs[i].id}'>blog módosítása</button>`
-        elem.innerHTML += `<button class='deleteButton' onclick='deleteBlog()' value='${blogs[i].id}'>blog törlése</button>`
+        elem.innerHTML += `<p> Eladó: ${selectedSeller.name} <br>Lakcím: ${selectedSeller.address}<br>Adószám: ${selectedSeller.taxNumber}</p>`
+        elem.innerHTML += `<p> Vevő: ${selectedBuyer.name} <br>Lakcím: ${selectedBuyer.address}<br>Adószám: ${selectedBuyer.taxNumber}</p>`
+        elem.innerHTML += `<p> Számlaszám: ${bill.billNumber}</p>`
+        elem.innerHTML += `<p> Kelt: ${bill.created}</p>`
+        elem.innerHTML += `<p> Befizetve: ${bill.payDay}</p>`
+        elem.innerHTML += `<p> Határidő: ${bill.deadline}</p>`
+        elem.innerHTML += `<p> Összeg: ${bill.total} Forint</p>`
+        elem.innerHTML += `<p> Áfa: ${bill.afa} %</p>`
+        elem.innerHTML += `<button class='modify' onclick='updateBill()' value='${bill.id}'>számla módosítása</button>`
+        elem.innerHTML += `<button class='deleteButton' onclick='deleteBill()' value='${bill.id}'>számla törlése</button>`
         tartalom.innerHTML += `</div>`
     }
 
     const modifyButtons = document.getElementsByClassName('modify')
     const deleteButtons = document.getElementsByClassName('deleteButton')
     for (let i = 0; i < modifyButtons.length; i++) {
-        modifyButtons[i].addEventListener("click", (event) => { selectedBlogId = event.target.value })
+        modifyButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value })
     }
     for (let i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].addEventListener("click", (event) => { selectedBlogId = event.target.value })
+        deleteButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value })
     }
 
 }
 
-async function updateBlog() {
+async function updateBill() {
     tartalom.innerHTML = ""
-    blogs = await getAllBillsFunction();
-    let blog
-    for (const temp of blogs) {
-        if (selectedBlogId == temp.id) {
-            blog = temp
+    bills = await getAllBillsFunction();
+    let bill
+    for (const temp of bills) {
+        if (selectedBillId == temp.id) {
+            bill = temp
             break;
         }
     }
-    tartalom.innerHTML += `<label for='title'>Cím:</label> <input type='text' id='title' value='${blog.title}'>`
-    tartalom.innerHTML += `<label for='category'>Kategória:</label> <input type='text' id='category' value='${blog.category}'>`
-    tartalom.innerHTML += `<label for='content'>Tartalom:</label> <input type='text' id='content'value='${blog.content}'>`
-    tartalom.innerHTML += `<button id='submit' onclick='saveUpdatedBlog()'>felhasználó mentése</button>`
+    tartalom.innerHTML += `<label for='billNumber'>Számlaszám(például:11111111-11111111-11111111):</label> <input type='text' id='billNumber'  placeholder='11111111-11111111-11111111' value='${bill.billNumber}'> `
+    tartalom.innerHTML += `<label for='total' >Összeg:</label> <input type='number' id='total' min='0' value='${bill.total}'>`
+    tartalom.innerHTML += `<label for='afa'>Áfa:</label> <input type='number' id='afa' min='0' value='${bill.afa}'>`
+
+    tartalom.innerHTML += `<div id='createdP'>`
+    const createdBekezdes = document.getElementById("createdP");
+    createdBekezdes.innerHTML = `<label for='created'>Számla kelte:</label> <input type='date' id='created' value='${bill.created}'>`
+    tartalom.innerHTML += `</div>`
+
+    tartalom.innerHTML += `<div id='deadLineP'>`
+    const deadLineBekezdes = document.getElementById("deadLineP");
+    deadLineBekezdes.innerHTML = `<label for='deadline'>Fizetési határidő:</label> <input type='date' id='deadline' value='${bill.deadline}'>`
+    tartalom.innerHTML += `</div>`
+
+    tartalom.innerHTML += `<div id='payDayP'>`
+    const payDayBekezdes = document.getElementById("payDayP");
+    payDayBekezdes.innerHTML = `<label for='payDay'>Befizetés napja:</label> <input type='date' id='payDay' value='${bill.payDay}'>`
+    tartalom.innerHTML += `</div>`
+
+    tartalom.innerHTML += "<button id='submit' onclick='saveUpdatedBill()'>számla mentése</button>"
     tartalom.innerHTML += "<p id='message'></p>"
+
 
 }
 
-async function saveUpdatedBlog() {
-    blogs = await getAllBillsFunction();
-    let blog
-    for (const temp of blogs) {
-        console.log(selectedBlogId)
+async function saveUpdatedBill() {
+    bills = await getAllBillsFunction();
+    let bill
+    for (const temp of bills) {
 
-        if (selectedBlogId == temp.id) {
-            blog = temp
-            console.log("sajt")
+        if (selectedBillId == temp.id) {
+            bill = temp
             break;
         }
     }
     if (document.getElementById("message").innerHTML != "") {
         document.getElementById("message").innerHTML = ""
     }
-    const title = document.getElementById("title").value.trim();
-    const category = document.getElementById("category").value.trim();
-    const content = document.getElementById("content").value.trim();
+    const billNumber = document.getElementById("billNumber").value.trim();
+    let total = document.getElementById("total").value.trim();
+    let afa = document.getElementById("afa").value.trim();
+    let created = document.getElementById("created").value;
+    let payDay = document.getElementById("payDay").value.trim();
+    let deadline = document.getElementById("deadline").value;
 
-    if (title != undefined && title.length > 0 && category != undefined && category.length > 0 && content != undefined && content.length > 0) {
-        const d = new Date()
-        const dateString = `${d.getFullYear()}.${d.getMonth()}.${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-        let test = {
-            "userId": `${blog.userId}`,
-            "title": `${title}`,
-            "category": `${category}`,
-            "content": `${content}`,
-            "created": `${blog.created}`,
-            "lastModified": `${dateString}`
+    if (billNumber != undefined && billNumber.length > 0 && total != undefined && total.length > 0 && afa != undefined && afa.length > 0 && created != undefined && created.length > 0 && payDay != undefined && payDay.length > 0 && deadline != undefined && deadline.length > 0) {
+        
+        if (billNumber.length != 26 || !billNumberRegex.test(billNumber)) {
+            document.getElementById("message").innerHTML = "Adjon meg helyes számlaszámot!"
+            return
         }
-        await putBillFunction(JSON.stringify(test), blog.id);
+        for (const bill of bills) {
+            if (bill.billNumber == billNumber && bill.id != selectedBillId) {
+                document.getElementById("message").innerHTML = "Ilyen számlaszám már létezik!"
+                return
+            }
+        }
+        total =Math.round(parseFloat(total))
+        if(total < 0)
+        {
+            document.getElementById("message").innerHTML = "az összeg nem lehet negatív!"
+                return
+        }
+        afa =Math.round(parseFloat(afa))
+        if(afa < 0)
+        {
+            document.getElementById("message").innerHTML = "az ÁFA nem lehet negatív!"
+                return
+        }
+        created = new Date(created)
+        deadline = new Date(deadline)
+        payDay = new Date(payDay)
+        if(created >= deadline)
+        {
+            document.getElementById("message").innerHTML = "A határidő nem lehet a keltezés napja vagy előtte!"
+            return
+        }
+        if(created > payDay)
+        {
+            document.getElementById("message").innerHTML = "Nem lehet a keltezés napja előtt befizetni!"
+            return
+        }
+         if(deadline < payDay)
+        {
+            document.getElementById("message").innerHTML = "Nem lehet a határidő után befizetni!"
+            return
+        }
+        const dateStringCreated = `${created.getFullYear()}-${created.getMonth()>9 ? created.getMonth() : "0"+created.getMonth()}-${created.getDate()>9 ? created.getDate() : "0"+created.getDate()}`
+        const dateStringDeadline= `${deadline.getFullYear()}-${deadline.getMonth()>9 ? deadline.getMonth() : "0"+deadline.getMonth()}-${deadline.getDate()>9 ? deadline.getDate() : "0"+deadline.getDate()}`
+        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()>9 ? payDay.getMonth() : "0"+payDay.getMonth()}-${payDay.getDate()>9 ? payDay.getDate() : "0"+payDay.getDate()}`
+        let test = {
+            "sellerId": `${bill.sellerId}`,
+            "buyerId": `${bill.buyerId}`,
+            "billNumber": `${billNumber}`,
+            "created":`${dateStringCreated}`,
+            "payday": `${dateStringDeadline}`,
+            "deadline": `${dateStringPayDay}`,
+            "total":total,
+            "afa":afa
+        }
+        await putBillFunction(JSON.stringify(test), bill.id);
         tartalom.innerHTML = "";
     }
     else {
@@ -728,10 +825,10 @@ async function saveUpdatedBlog() {
     }
 }
 
-async function deleteBlog() {
-    blogs = await getAllBillsFunction();
-    await deleteBillFunction(selectedBlogId);
+async function deleteBill() {
+    bills = await getAllBillsFunction();
+    await deleteBillFunction(selectedBillId);
     tartalom.innerHTML = "";
-    listBlogs()
+    listBills()
 
 }

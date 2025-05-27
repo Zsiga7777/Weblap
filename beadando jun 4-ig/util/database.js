@@ -35,7 +35,7 @@ export const getBills = () => db
     .prepare('SELECT * FROM bills').all()
 
 export const saveBill = (sellerId, buyerId,billNumber,created,payDay, deadline, total, afa) => db
-    .prepare('INSERT INTO bills (sellerId, buyerId,billNumber,created,payDay, deadline, total, afa) VALUES (?,?,?,?,?,?,?,?)').run(sellerId, buyerId,billNumber,created,payDay, deadline, total, afa)
+    .prepare('INSERT INTO bills (sellerId, buyerId, billNumber, created, payDay, deadline, total, afa) VALUES (?,?,?,?,?,?,?,?)').run(sellerId, buyerId,billNumber,created,payDay, deadline, total, afa)
 
 export const updateBill = (id, sellerId, buyerId,billNumber,created,payDay, deadline, total, afa) => db
     .prepare('UPDATE bills SET sellerId = ?, buyerId = ?,billNumber = ?,created = ?,payDay = ?, deadline = ?, total = ?,afa = ? WHERE id = ?').run(sellerId, buyerId,billNumber,created,payDay, deadline, total, afa, id)
@@ -51,19 +51,19 @@ const buyers = [
     { name: 'Laci', address : "cím3", taxNumber:"44444444-4-44"}
 ]
 
-const d = new Date()
-const dateString = `${d.getFullYear()}.${d.getMonth()}.${d.getDate()}`
+const dateString = `2005-10-01`
+const deadLineDateString = `2025-10-01`
 
 const bills = [
-    {sellerId : 1, buyerId : 1,billNumber: "11111111-11111111-11111111",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 10000, afa : 27},
-    {sellerId : 1, buyerId : 1,billNumber: "22222222-22222222-22222222",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 20000, afa : 27},
-    {sellerId : 1, buyerId : 1,billNumber: "33333333-33333333-33333333",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 30000, afa : 27},
-    {sellerId : 1, buyerId : 2,billNumber: "44444444-44444444-44444444",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 40000, afa : 27},
-    {sellerId : 1, buyerId : 2,billNumber: "55555555-55555555-55555555",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 50000, afa : 27},
-    {sellerId : 1, buyerId : 2,billNumber: "66666666-66666666-66666666",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 60000, afa : 27},
-    {sellerId : 1, buyerId : 3,billNumber: "77777777-77777777-77777777",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 70000, afa : 27},
-    {sellerId : 1, buyerId : 3,billNumber: "88888888-88888888-88888888",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 180000, afa : 27},
-    {sellerId : 1, buyerId : 3,billNumber: "99999999-99999999-99999999",created : `${dateString}`,payDay : `${dateString}`, deadline : `${dateString}`, total : 90000, afa : 27},
+    {sellerId : 1, buyerId : 1,billNumber: "11111111-11111111-11111111",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 10000, afa : 27},
+    {sellerId : 1, buyerId : 1,billNumber: "22222222-22222222-22222222",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 20000, afa : 27},
+    {sellerId : 1, buyerId : 1,billNumber: "33333333-33333333-33333333",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 30000, afa : 27},
+    {sellerId : 1, buyerId : 2,billNumber: "44444444-44444444-44444444",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 40000, afa : 27},
+    {sellerId : 1, buyerId : 2,billNumber: "55555555-55555555-55555555",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 50000, afa : 27},
+    {sellerId : 1, buyerId : 2,billNumber: "66666666-66666666-66666666",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 60000, afa : 27},
+    {sellerId : 1, buyerId : 3,billNumber: "77777777-77777777-77777777",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 70000, afa : 27},
+    {sellerId : 1, buyerId : 3,billNumber: "88888888-88888888-88888888",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 180000, afa : 27},
+    {sellerId : 1, buyerId : 3,billNumber: "99999999-99999999-99999999",created : `${dateString}`,payDay : `${dateString}`, deadline : `${deadLineDateString}`, total : 90000, afa : 27},
 ]
 
 if(getBills().length == 0 && getBuyers() == 0 && getSellers() == 0)
