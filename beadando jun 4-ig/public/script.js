@@ -206,11 +206,11 @@ async function postBillFunction(test) {
             {
                 "Content-type": "application/json; charset=UTF-8"
             },
-            body: test,
+            body: test
         });
         const data = await res.json();
         if (!res.ok) {
-            console.log(data.description);
+            console.log(data);
             return;
         }
 
@@ -637,14 +637,14 @@ async function saveBill() {
         const dateStringDeadline= `${deadline.getFullYear()}-${deadline.getMonth()>9 ? deadline.getMonth() : "0"+deadline.getMonth()}-${deadline.getDate()>9 ? deadline.getDate() : "0"+deadline.getDate()}`
         const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()>9 ? payDay.getMonth() : "0"+payDay.getMonth()}-${payDay.getDate()>9 ? payDay.getDate() : "0"+payDay.getDate()}`
         let test = {
-            "sellerId": sellerId,
-            "buyerId": buyerId,
-            "billNumber": `${billNumber}`,
-            "created":`${dateStringCreated}`,
-            "payday": `${dateStringDeadline}`,
-            "deadline": `${dateStringPayDay}`,
-            "total":total,
-            "afa":afa
+            sellerId: sellerId,
+            buyerId: buyerId,
+            billNumber: `${billNumber}`,
+            created:`${dateStringCreated}`,
+            payDay: `${dateStringPayDay}`,
+            deadline: `${dateStringDeadline}`,
+            total:total,
+            afa:afa
         }
         await postBillFunction(JSON.stringify(test));
         tartalom.innerHTML = "";
@@ -770,6 +770,8 @@ async function saveUpdatedBill() {
         }
         for (const bill of bills) {
             if (bill.billNumber == billNumber && bill.id != selectedBillId) {
+                console.log(bill)
+                console.log(selectedBillId)
                 document.getElementById("message").innerHTML = "Ilyen számlaszám már létezik!"
                 return
             }
@@ -808,14 +810,14 @@ async function saveUpdatedBill() {
         const dateStringDeadline= `${deadline.getFullYear()}-${deadline.getMonth()>9 ? deadline.getMonth() : "0"+deadline.getMonth()}-${deadline.getDate()>9 ? deadline.getDate() : "0"+deadline.getDate()}`
         const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()>9 ? payDay.getMonth() : "0"+payDay.getMonth()}-${payDay.getDate()>9 ? payDay.getDate() : "0"+payDay.getDate()}`
         let test = {
-            "sellerId": `${bill.sellerId}`,
-            "buyerId": `${bill.buyerId}`,
-            "billNumber": `${billNumber}`,
-            "created":`${dateStringCreated}`,
-            "payday": `${dateStringDeadline}`,
-            "deadline": `${dateStringPayDay}`,
-            "total":total,
-            "afa":afa
+            sellerId: `${bill.sellerId}`,
+            buyerId: `${bill.buyerId}`,
+            billNumber: `${billNumber}`,
+            created:`${dateStringCreated}`,
+            payDay: `${dateStringDeadline}`,
+            deadline: `${dateStringPayDay}`,
+            total:total,
+            afa:afa
         }
         await putBillFunction(JSON.stringify(test), bill.id);
         tartalom.innerHTML = "";

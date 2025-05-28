@@ -2,7 +2,7 @@ import Database from 'better-sqlite3'
 
 const db = new Database('./data/database.sqlite');
 
-db.prepare(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING)`).run();
+db.prepare(`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name STRING UNIQUE)`).run();
 db.prepare(`CREATE TABLE IF NOT EXISTS blogs (id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER, title STRING, category STRING, content STRING, created DATE, lastModified DATE, FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE )`).run();
 
 
