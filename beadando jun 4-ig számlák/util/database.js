@@ -56,7 +56,7 @@ const buyers = [
     { name: 'Laci', address: "cím3", taxNumber: "44444444-4-44" }
 ];
 
-const dateString = `2005-10-01`;
+const dateString = `2005-01-31`;
 const deadLineDateString = `2025-10-01`;
 
 const bills = [

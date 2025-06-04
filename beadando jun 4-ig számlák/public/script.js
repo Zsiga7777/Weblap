@@ -316,7 +316,6 @@ async function deleteBillFunction(id) {
         console.log(error);
     }
 }
-
 let bills = [];
 let sellers = [];
 let buyers = [];
@@ -326,8 +325,12 @@ const billNumberRegex = /^[0-9]{8}-[0-9]{8}-[0-9]{8}$/;
 const taxNumberRegex = /^[0-9]{8}-[0-9]{1}-[0-9]{2}$/;
 const content = document.getElementById("content");
 
+
+window.onload = async() => {
+await listBills();
+};
+
 function addPerson() {
-    content.style.display = "block";
     content.innerHTML = "<label for='personType'>Válassz típust:</label> <select name='personType' id='personType'>";
     const menu = document.getElementById("personType");
     menu.innerHTML += `<option value='buyer'>vásárló</option>`;
@@ -379,7 +382,7 @@ async function savePerson() {
             await postSellerFunction(JSON.stringify(body));
         }
         content.innerHTML = "";
-        content.style.display = "none";
+        await listBills();
     }
     else {
         document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
@@ -387,7 +390,6 @@ async function savePerson() {
 }
 
 async function updateUser() {
-    content.style.display = "block";
     buyers = await getAllBuyerFunction();
     sellers = await getAllSellerFunction();
     if (buyers.length == 0 && sellers.length == 0) {
@@ -475,7 +477,7 @@ async function saveUpdatedPerson() {
             await putSellerFunction(JSON.stringify(body), selectedPerson.id);
         }
         content.innerHTML = "";
-        content.style.display = "none";
+await listBills()
     }
     else {
         document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
@@ -498,7 +500,6 @@ async function findPerson(taxNumber) {
 }
 
 async function deletePerson() {
-    content.style.display = "block";
     buyers = await getAllBuyerFunction();
     sellers = await getAllSellerFunction();
     if (buyers.length > 0 || sellers.length > 0) {
@@ -521,6 +522,10 @@ async function deletePerson() {
 }
 
 async function deleteSelectedPerson() {
+    if(confirm("Biztos törli a felhasználót?") == false)
+    {
+        return;
+    }
     buyers = await getAllBuyerFunction();
     sellers = await getAllSellerFunction();
     buyerTaxNumbers = await getAllBuyersTaxNumberFunction();
@@ -547,12 +552,11 @@ async function deleteSelectedPerson() {
         await deleteSellerFunction(selectedPerson.id);
     }
     content.innerHTML = "";
-    content.style.display = "none";
+await listBills();
 
 }
 
 async function addBill() {
-    content.style.display = "block";
     buyers = await getAllBuyerFunction();
     sellers = await getAllSellerFunction();
     if (buyers.length == 0) {
@@ -664,9 +668,9 @@ async function saveBill() {
             document.getElementById("message").innerHTML = "Nem lehet a határidő után befizetni!";
             return;
         }
-        const dateStringCreated = `${created.getFullYear()}-${created.getMonth() > 9 ? created.getMonth() : "0" + created.getMonth()}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
-        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth() > 9 ? deadline.getMonth() : "0" + deadline.getMonth()}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
-        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth() > 9 ? payDay.getMonth() : "0" + payDay.getMonth()}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
+        const dateStringCreated = `${created.getFullYear()}-${created.getMonth()+1 > 9 ? created.getMonth()+1 : "0" + (created.getMonth()+1)}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
+        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth()+1 > 9 ? deadline.getMonth()+1 : "0" + (deadline.getMonth()+1)}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
+        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()+1 > 9 ? payDay.getMonth()+1 : "0" + (payDay.getMonth()+1)}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
         let body = {
             sellerId: sellerId,
             buyerId: buyerId,
@@ -679,7 +683,7 @@ async function saveBill() {
         };
         await postBillFunction(JSON.stringify(body));
         content.innerHTML = "";
-        content.style.display = "none";
+await listBills()
     }
     else {
         document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
@@ -688,7 +692,6 @@ async function saveBill() {
 
 async function listBills() {
     content.innerHTML = "";
-    content.style.display = "block";
     buyers = await getAllBuyerFunction();
     sellers = await getAllSellerFunction();
     bills = await getAllBillsFunction();
@@ -729,13 +732,13 @@ async function listBills() {
         content.innerHTML += `</div>`;
     }
 
-    const modifyButtons = document.getElementsByClassName('modify')
-    const deleteButtons = document.getElementsByClassName('deleteButton')
+    const modifyButtons = document.getElementsByClassName('modify');
+    const deleteButtons = document.getElementsByClassName('deleteButton');
     for (let i = 0; i < modifyButtons.length; i++) {
-        modifyButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value })
+        modifyButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value });
     }
     for (let i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value })
+        deleteButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value });
     }
 
 }
@@ -832,9 +835,9 @@ async function saveUpdatedBill() {
             document.getElementById("message").innerHTML = "Nem lehet a határidő után befizetni!";
             return;
         }
-        const dateStringCreated = `${created.getFullYear()}-${created.getMonth() > 9 ? created.getMonth() : "0" + created.getMonth()}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
-        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth() > 9 ? deadline.getMonth() : "0" + deadline.getMonth()}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
-        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth() > 9 ? payDay.getMonth() : "0" + payDay.getMonth()}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
+        const dateStringCreated = `${created.getFullYear()}-${created.getMonth()+1 > 9 ? created.getMonth()+1 : "0" + (created.getMonth()+1)}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
+        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth()+1 > 9 ? deadline.getMonth()+1 : "0" + (deadline.getMonth()+1)}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
+        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()+1 > 9 ? payDay.getMonth()+1 : "0" + (payDay.getMonth()+1)}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
         let body = {
             sellerId: `${bill.sellerId}`,
             buyerId: `${bill.buyerId}`,
@@ -847,7 +850,7 @@ async function saveUpdatedBill() {
         };
         await putBillFunction(JSON.stringify(body), bill.id);
         content.innerHTML = "";
-        content.style.display = "none";
+await listBills()
     }
     else {
         document.getElementById("message").innerHTML += "Adjon meg minden adatot";
@@ -855,6 +858,10 @@ async function saveUpdatedBill() {
 }
 
 async function deleteBill() {
+    if(confirm("Biztos törli a számlát?") == false)
+    {
+        return;
+    }
     bills = await getAllBillsFunction();
     await deleteBillFunction(selectedBillId);
     content.innerHTML = "";
