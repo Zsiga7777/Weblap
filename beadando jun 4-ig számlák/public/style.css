@@ -124,3 +124,95 @@ button:hover {
         width: 90%;
     }
 }
+.lista {
+    background-color: #edf6f9;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    border-left: 5px solid #00b4d8;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+}
+
+.lista .bill-header {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #0077b6;
+}
+
+.lista .bill-parties {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.lista .bill-parties .party {
+    flex: 1 1 45%;
+    padding: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.lista .bill-parties .party h4 {
+    margin-bottom: 0.5rem;
+    color: #023e8a;
+}
+
+.lista .dates {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.lista .dates div {
+    flex: 1 1 30%;
+    margin-bottom: 0.5rem;
+}
+
+.lista .totals {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ccc;
+}
+
+.lista .totals p {
+    font-weight: bold;
+    margin: 0.5rem 0;
+}
+
+/* Módosítás és sztornó gombok a végén */
+.lista .actions {
+    margin-top: 1rem;
+}
+
+.lista .actions button {
+    margin-right: 0.5rem;
+}
+
+/* Mobilbarát elrendezés */
+@media (max-width: 768px) {
+    .lista .bill-parties {
+        flex-direction: column;
+    }
+
+    .lista .dates {
+        flex-direction: column;
+    }
+
+    .lista .dates div {
+        flex: 1 1 100%;
+    }
+}
+
+.storno{
+    text-align: center;
+    color: red;
+    font-weight: bold;
+}

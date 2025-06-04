@@ -321,29 +321,25 @@ let sellers = [];
 let buyers = [];
 let selectedBillId = 0;
 let selectedPerson;
-const billNumberRegex = /^[0-9]{8}-[0-9]{8}-[0-9]{8}$/;
+let selectedBuyer;
+let selectedSeller;
 const taxNumberRegex = /^[0-9]{8}-[0-9]{1}-[0-9]{2}$/;
 const content = document.getElementById("content");
 
 
-window.onload = async() => {
-await listBills();
+window.onload = async () => {
+    await listBills();
 };
 
-function addPerson() {
-    content.innerHTML = "<label for='personType'>Válassz típust:</label> <select name='personType' id='personType'>";
-    const menu = document.getElementById("personType");
-    menu.innerHTML += `<option value='buyer'>vásárló</option>`;
-    menu.innerHTML += `<option value='seller'>eladó</option>`;
-    content.innerHTML += "</select>";
-    content.innerHTML += "<label for='name'>név:</label> <input type='text' id='name'>";
+function addBuyer() {
+    content.innerHTML = "<label for='name'>név:</label> <input type='text' id='name'>";
     content.innerHTML += "<label for='address'>lakcím:</label> <input type='text' id='address'>";
     content.innerHTML += "<label for='taxNumber'>adószám(például:11111111-1-11):</label> <input type='text' id='taxNumber' placeholder='11111111-1-11'>";
-    content.innerHTML += "<button id='submit' onclick='savePerson()'>személy mentése</button>";
+    content.innerHTML += "<button id='submit' onclick='saveBuyer()'>Vevő mentése</button>";
     content.innerHTML += "<p id='message'></p>";
 }
 
-async function savePerson() {
+async function saveBuyer() {
     if (document.getElementById("message").innerHTML != "") {
         document.getElementById("message").innerHTML = "";
     }
@@ -368,19 +364,9 @@ async function savePerson() {
             "address": `${address}`,
             "taxNumber": `${taxNumber}`
         };
-        const listOfSelects = document.getElementsByTagName("option");
-        let type;
-        for (let i = 0; i < listOfSelects.length; i++) {
-            if (listOfSelects[i].selected) {
-                type = listOfSelects[i].value;
-            }
-        }
-        if (type == "buyer") {
-            await postBuyerFunction(JSON.stringify(body));
-        }
-        else {
-            await postSellerFunction(JSON.stringify(body));
-        }
+
+        await postBuyerFunction(JSON.stringify(body));
+
         content.innerHTML = "";
         await listBills();
     }
@@ -389,22 +375,18 @@ async function savePerson() {
     }
 }
 
-async function updateUser() {
+async function updateBuyer() {
     buyers = await getAllBuyerFunction();
-    sellers = await getAllSellerFunction();
-    if (buyers.length == 0 && sellers.length == 0) {
-        content.innerHTML = "<p id='message'> Nincs személy!</p>";
+    if (buyers.length == 0) {
+        content.innerHTML = "<p id='message'> Nincs vevő!</p>";
         return;
     }
-    content.innerHTML = "<label for='person'>Válassz módosítandó személyt:</label> <select name='person' id='person' onchange='loadPersonSelect()'>";
+    content.innerHTML = "<label for='person'>Válassz módosítandó vevőt:</label> <select name='person' id='person' onchange='loadBuyerSelect()'>";
     const menu = document.getElementById("person");
     menu.innerHTML += " <option value='' selected disabled hidden>Válaszz</option>";
 
     for (const buyer of buyers) {
         menu.innerHTML += `<option value='${buyer.taxNumber}'>${buyer.name}</option>`;
-    }
-    for (const seller of sellers) {
-        menu.innerHTML += `<option value='${seller.taxNumber}'>${seller.name}</option>`;
     }
     content.innerHTML += "</select>";
     content.innerHTML += "<div id='loadPersonData'>";
@@ -412,7 +394,7 @@ async function updateUser() {
     content.innerHTML += "<p id='message'></p>";
 
 }
-async function loadPersonSelect() {
+async function loadBuyerSelect() {
     const loadPerson = document.getElementById("loadPersonData");
     const options = document.getElementsByTagName("option");
     let person;
@@ -428,11 +410,11 @@ async function loadPersonSelect() {
     loadPerson.innerHTML += `<label for='name'>név:</label> <input type='text' id='name' value='${person.name}'>`;
     loadPerson.innerHTML += `<label for='address'>lakcím:</label> <input type='text' id='address' value='${person.address}'>`;
     loadPerson.innerHTML += `<label for='taxNumber'>adószám(például:11111111-1-11):</label> <input type='text' id='taxNumber' placeholder='11111111-1-11' value='${person.taxNumber}'>`;
-    loadPerson.innerHTML += "<button id='submit' onclick='saveUpdatedPerson()'>személy mentése</button>";
+    loadPerson.innerHTML += "<button id='submit' onclick='saveUpdatedBuyer()'>Vevő mentése</button>";
     selectedPerson = person;
 }
 
-async function saveUpdatedPerson() {
+async function saveUpdatedBuyer() {
     if (document.getElementById("message").innerHTML != "") {
         document.getElementById("message").innerHTML = "";
     }
@@ -440,28 +422,24 @@ async function saveUpdatedPerson() {
     const address = document.getElementById("address").value.trim();
     const taxNumber = document.getElementById("taxNumber").value.trim();
 
-    buyerTaxNumbers = await getAllBuyersTaxNumberFunction();
     sellerTaxNumbers = await getAllSellerTaxNumberFunction();
+    buyers = await getAllBuyerFunction()
     if (name != undefined && name.length > 0 && address != undefined && address.length > 0) {
 
         if (taxNumber.length != 13 || !taxNumberRegex.test(taxNumber)) {
             document.getElementById("message").innerHTML = "Adjon helyes adószámot!";
             return;
         }
-        let type;
 
-        if (buyerTaxNumbers.includes(selectedPerson.taxNumber)) {
-
-            type = "buyer";
-        }
-
-        else if (sellerTaxNumbers.includes(selectedPerson.taxNumber)) {
-            type = "seller";
-        }
-
-        if (buyerTaxNumbers.includes(taxNumber) || sellerTaxNumbers.includes(taxNumber)) {
+        if (sellerTaxNumbers.includes(taxNumber)) {
             document.getElementById("message").innerHTML = "ilyen adószám már létezik!";
             return;
+        }
+        for (const buyer of buyers) {
+            if (buyer.taxNumber == taxNumber && buyer.id != selectedPerson.id) {
+                document.getElementById("message").innerHTML = "ilyen adószám már létezik!";
+                return;
+            }
         }
 
         let body = {
@@ -470,14 +448,11 @@ async function saveUpdatedPerson() {
             "taxNumber": `${taxNumber}`
         };
 
-        if (type == "buyer") {
-            await putBuyerFunction(JSON.stringify(body), selectedPerson.id);
-        }
-        else {
-            await putSellerFunction(JSON.stringify(body), selectedPerson.id);
-        }
+
+        await putBuyerFunction(JSON.stringify(body), selectedPerson.id);
+
         content.innerHTML = "";
-await listBills()
+        await listBills()
     }
     else {
         document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
@@ -499,60 +474,203 @@ async function findPerson(taxNumber) {
     }
 }
 
-async function deletePerson() {
+async function deleteBuyer() {
     buyers = await getAllBuyerFunction();
-    sellers = await getAllSellerFunction();
-    if (buyers.length > 0 || sellers.length > 0) {
-        content.innerHTML = "<label for='person'>Válassz törlendő személyt:</label> <select name='person' id='person'>";
+    if (buyers.length > 0) {
+        content.innerHTML = "<label for='person'>Válassz törlendő vevőt:</label> <select name='person' id='person'>";
         const menu = document.getElementById("person");
         menu.innerHTML += " <option value='' selected disabled hidden>Válaszz</option>";
         for (const buyer of buyers) {
             menu.innerHTML += `<option value='${buyer.taxNumber}'>${buyer.name}</option>`;
         }
-        for (const seller of sellers) {
-            menu.innerHTML += `<option value='${seller.taxNumber}'>${seller.name}</option>`;
-        }
         content.innerHTML += "</select>";
-        content.innerHTML += "<button id='submit' onclick='deleteSelectedPerson()'>személy törlése</button>";
+        content.innerHTML += "<button id='submit' onclick='deleteSelectedBuyer()'>vevő törlése</button>";
         content.innerHTML += "<p id='message'></p>";
     }
     else {
-        content.innerHTML = "<p id='message'> Nincs személy!</p>";
+        content.innerHTML = "<p id='message'> Nincs vevő!</p>";
     }
 }
 
-async function deleteSelectedPerson() {
-    if(confirm("Biztos törli a felhasználót?") == false)
-    {
+async function deleteSelectedBuyer() {
+    if (confirm("Biztos törli a vevőt?") == false) {
         return;
     }
-    buyers = await getAllBuyerFunction();
-    sellers = await getAllSellerFunction();
-    buyerTaxNumbers = await getAllBuyersTaxNumberFunction();
-    sellerTaxNumbers = await getAllSellerTaxNumberFunction();
     const listOfSelects = document.getElementsByTagName("option");
     for (let i = 0; i < listOfSelects.length; i++) {
         if (listOfSelects[i].selected) {
             selectedPerson = await findPerson(listOfSelects[i].value);
         }
     }
-    let type;
-    if (buyerTaxNumbers.includes(selectedPerson.taxNumber)) {
 
-        type = "buyer";
-    }
+    await deleteBuyerFunction(selectedPerson.id);
 
-    else if (sellerTaxNumbers.includes(selectedPerson.taxNumber)) {
-        type = "seller";
+    content.innerHTML = "";
+    await listBills();
+
+}
+
+function addSeller() {
+    content.innerHTML = "<label for='name'>név:</label> <input type='text' id='name'>";
+    content.innerHTML += "<label for='address'>lakcím:</label> <input type='text' id='address'>";
+    content.innerHTML += "<label for='taxNumber'>adószám(például:11111111-1-11):</label> <input type='text' id='taxNumber' placeholder='11111111-1-11'>";
+    content.innerHTML += "<button id='submit' onclick='saveSeller()'>Eladó mentése</button>";
+    content.innerHTML += "<p id='message'></p>";
+}
+
+async function saveSeller() {
+    if (document.getElementById("message").innerHTML != "") {
+        document.getElementById("message").innerHTML = "";
     }
-    if (type == "buyer") {
-        await deleteBuyerFunction(selectedPerson.id);
+    const name = document.getElementById("name").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const taxNumber = document.getElementById("taxNumber").value.trim();
+
+    buyerTaxNumbers = await getAllBuyersTaxNumberFunction();
+    sellerTaxNumbers = await getAllSellerTaxNumberFunction();
+    if (name != undefined && name.length > 0 && address != undefined && address.length > 0 && taxNumber != undefined && taxNumber.length > 0) {
+        if (taxNumber.length != 13 || !taxNumberRegex.test(taxNumber)) {
+            document.getElementById("message").innerHTML = "Adjon helyes adószámot!";
+            return;
+        }
+        if (buyerTaxNumbers.includes(taxNumber) || sellerTaxNumbers.includes(taxNumber)) {
+            document.getElementById("message").innerHTML = "ilyen adószám már létezik!";
+            return;
+        }
+
+        let body = {
+            "name": `${name}`,
+            "address": `${address}`,
+            "taxNumber": `${taxNumber}`
+        };
+
+        await postSellerFunction(JSON.stringify(body));
+
+        content.innerHTML = "";
+        await listBills();
     }
     else {
-        await deleteSellerFunction(selectedPerson.id);
+        document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
     }
+}
+
+async function updateSeller() {
+    sellers = await getAllSellerFunction();
+    if (sellers.length == 0) {
+        content.innerHTML = "<p id='message'> Nincs eladó!</p>";
+        return;
+    }
+    content.innerHTML = "<label for='person'>Válassz módosítandó eladót:</label> <select name='person' id='person' onchange='loadSellerSelect()'>";
+    const menu = document.getElementById("person");
+    menu.innerHTML += " <option value='' selected disabled hidden>Válaszz</option>";
+
+    for (const seller of sellerss) {
+        menu.innerHTML += `<option value='${seller.taxNumber}'>${seller.name}</option>`;
+    }
+    content.innerHTML += "</select>";
+    content.innerHTML += "<div id='loadPersonData'>";
+    content.innerHTML += "</div'>";
+    content.innerHTML += "<p id='message'></p>";
+
+}
+async function loadSellerSelect() {
+    const loadPerson = document.getElementById("loadPersonData");
+    const options = document.getElementsByTagName("option");
+    let person;
+    for (const option of options) {
+
+        if (option.selected) {
+            person = await findPerson(option.value);
+        }
+    }
+    if (loadPerson.innerHTML != "") {
+        loadPerson.innerHTML = "";
+    }
+    loadPerson.innerHTML += `<label for='name'>név:</label> <input type='text' id='name' value='${person.name}'>`;
+    loadPerson.innerHTML += `<label for='address'>lakcím:</label> <input type='text' id='address' value='${person.address}'>`;
+    loadPerson.innerHTML += `<label for='taxNumber'>adószám(például:11111111-1-11):</label> <input type='text' id='taxNumber' placeholder='11111111-1-11' value='${person.taxNumber}'>`;
+    loadPerson.innerHTML += "<button id='submit' onclick='saveUpdatedSeller()'>Eladó mentése</button>";
+    selectedPerson = person;
+}
+
+async function saveUpdatedSeller() {
+    if (document.getElementById("message").innerHTML != "") {
+        document.getElementById("message").innerHTML = "";
+    }
+    const name = document.getElementById("name").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const taxNumber = document.getElementById("taxNumber").value.trim();
+
+    buyerTaxNumbers = await getAllBuyersTaxNumberFunction();
+    sellers = await getAllSellerFunction()
+    if (name != undefined && name.length > 0 && address != undefined && address.length > 0) {
+
+        if (taxNumber.length != 13 || !taxNumberRegex.test(taxNumber)) {
+            document.getElementById("message").innerHTML = "Adjon helyes adószámot!";
+            return;
+        }
+
+        if (buyerTaxNumbers.includes(taxNumber)) {
+            document.getElementById("message").innerHTML = "ilyen adószám már létezik!";
+            return;
+        }
+        for (const seller of sellers) {
+            if (seller.taxNumber == taxNumber && seller.id != selectedPerson.id) {
+                document.getElementById("message").innerHTML = "ilyen adószám már létezik!";
+                return;
+            }
+        }
+
+        let body = {
+            "name": `${name}`,
+            "address": `${address}`,
+            "taxNumber": `${taxNumber}`
+        };
+
+
+        await putSellerFunction(JSON.stringify(body), selectedPerson.id);
+
+        content.innerHTML = "";
+        await listBills()
+    }
+    else {
+        document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
+    }
+}
+
+async function deleteSeller() {
+    sellers = await getAllSellerFunction();
+    if (sellers.length > 0) {
+        content.innerHTML = "<label for='person'>Válassz törlendő eladót:</label> <select name='person' id='person'>";
+        const menu = document.getElementById("person");
+        menu.innerHTML += " <option value='' selected disabled hidden>Válaszz</option>";
+        for (const seller of sellers) {
+            menu.innerHTML += `<option value='${seller.taxNumber}'>${seller.name}</option>`;
+        }
+        content.innerHTML += "</select>";
+        content.innerHTML += "<button id='submit' onclick='deleteSelectedSeller()'>eladó törlése</button>";
+        content.innerHTML += "<p id='message'></p>";
+    }
+    else {
+        content.innerHTML = "<p id='message'> Nincs eladó!</p>";
+    }
+}
+
+async function deleteSelectedSeller() {
+    if (confirm("Biztos törli az eladót?") == false) {
+        return;
+    }
+    const listOfSelects = document.getElementsByTagName("option");
+    for (let i = 0; i < listOfSelects.length; i++) {
+        if (listOfSelects[i].selected) {
+            selectedPerson = await findPerson(listOfSelects[i].value);
+        }
+    }
+
+    await deleteSellerFunction(selectedPerson.id);
+
     content.innerHTML = "";
-await listBills();
+    await listBills();
 
 }
 
@@ -580,8 +698,7 @@ async function addBill() {
         sellerMenu.innerHTML += `<option value='${sellers[i].id}' class='sellers'>${sellers[i].name}</option>`;
     }
     content.innerHTML += "</select>";
-    content.innerHTML += "<label for='billNumber'>Számlaszám(például:11111111-11111111-11111111):</label> <input type='text' id='billNumber'  placeholder='11111111-11111111-11111111'>";
-    content.innerHTML += "<label for='total' >Összeg(Ft):</label> <input type='number' id='total' min='0'>";
+    content.innerHTML += "<label for='total' >Nettó összeg(Ft):</label> <input type='number' id='total' min='0'>";
     content.innerHTML += "<label for='afa'>Áfa(%):</label> <input type='number' id='afa' min='0'>";
 
     content.innerHTML += "<div id='createdP'>";
@@ -608,41 +725,42 @@ async function saveBill() {
     if (document.getElementById("message").innerHTML != "") {
         document.getElementById("message").innerHTML = "";
     }
-    let sellerId = 0;
-    let buyerId = 0;
-    const billNumber = document.getElementById("billNumber").value.trim();
+    sellers = await getAllSellerFunction();
+    buyers = await getAllBuyerFunction();
+    bills = await getAllBillsFunction()
+    const billNumber = bills[bills.length - 1].billNumber + 1;
     let total = document.getElementById("total").value.trim();
     let afa = document.getElementById("afa").value.trim();
     let created = document.getElementById("created").value;
     let payDay = document.getElementById("payDay").value.trim();
     let deadline = document.getElementById("deadline").value;
 
-    if (billNumber != undefined && billNumber.length > 0 && total != undefined && total.length > 0 && afa != undefined && afa.length > 0 && created != undefined && created.length > 0 && payDay != undefined && payDay.length > 0 && deadline != undefined && deadline.length > 0) {
+    if (total != undefined && total.length > 0 && afa != undefined && afa.length > 0 && created != undefined && created.length > 0 && payDay != undefined && payDay.length > 0 && deadline != undefined && deadline.length > 0) {
         const selllerList = document.getElementsByClassName('sellers');
         const buyerList = document.getElementsByClassName('buyers');
-        for (const seller of selllerList) {
-            if (seller.selected) {
-                sellerId = parseInt(seller.value);
+        for (const sellerid of selllerList) {
+            if (sellerid.selected) {
+                for (const seller of sellers) {
+                    if (seller.id == parseInt(sellerid.value)) {
+                        selectedSeller = seller;
+                        break;
+                    }
+                }
                 break;
             }
         }
-        for (const buyer of buyerList) {
-            if (buyer.selected) {
-                buyerId = parseInt(buyer.value);
+        for (const buyerid of buyerList) {
+            if (buyerid.selected) {
+                for (const buyer of buyers) {
+                    if (buyer.id == parseInt(buyerid.value)) {
+                        selectedBuyer = buyer;
+                        break;
+                    }
+                }
                 break;
             }
         }
-        if (billNumber.length != 26 || !billNumberRegex.test(billNumber)) {
-            document.getElementById("message").innerHTML = "Adjon meg helyes számlaszámot!";
-            return;
-        }
-        bills = await getAllBillsFunction()
-        for (const bill of bills) {
-            if (bill.billNumber == billNumber) {
-                document.getElementById("message").innerHTML = "Ilyen számlaszám már létezik!";
-                return;
-            }
-        }
+
         total = Math.round(parseFloat(total))
         if (total < 0) {
             document.getElementById("message").innerHTML = "az összeg nem lehet negatív!";
@@ -653,37 +771,50 @@ async function saveBill() {
             document.getElementById("message").innerHTML = "az ÁFA nem lehet negatív!";
             return;
         }
+        if (afa > 100) {
+            document.getElementById("message").innerHTML = "az ÁFA nem lehet 100%-nál nagyobb!";
+            return;
+        }
         created = new Date(created);
         deadline = new Date(deadline);
         payDay = new Date(payDay);
-        if (created >= deadline) {
-            document.getElementById("message").innerHTML = "A határidő nem lehet a keltezés napja vagy előtte!";
+        var timestamp = created.getTime() + (30 * 24 * 60 * 60 * 1000)
+        if (created > deadline) {
+            document.getElementById("message").innerHTML = "A határidő nem lehet a keltezés napja előtt!";
+            return;
+        }
+        if (deadline.getTime() > timestamp) {
+            document.getElementById("message").innerHTML = "A határidő nem lehet 30 nappal a létrehozás után!";
             return;
         }
         if (created > payDay) {
             document.getElementById("message").innerHTML = "Nem lehet a keltezés napja előtt befizetni!";
             return;
         }
-        if (deadline < payDay) {
-            document.getElementById("message").innerHTML = "Nem lehet a határidő után befizetni!";
-            return;
-        }
-        const dateStringCreated = `${created.getFullYear()}-${created.getMonth()+1 > 9 ? created.getMonth()+1 : "0" + (created.getMonth()+1)}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
-        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth()+1 > 9 ? deadline.getMonth()+1 : "0" + (deadline.getMonth()+1)}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
-        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()+1 > 9 ? payDay.getMonth()+1 : "0" + (payDay.getMonth()+1)}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
+
+        const dateStringCreated = `${created.getFullYear()}-${created.getMonth() + 1 > 9 ? created.getMonth() + 1 : "0" + (created.getMonth() + 1)}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
+        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth() + 1 > 9 ? deadline.getMonth() + 1 : "0" + (deadline.getMonth() + 1)}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
+        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth() + 1 > 9 ? payDay.getMonth() + 1 : "0" + (payDay.getMonth() + 1)}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
         let body = {
-            sellerId: sellerId,
-            buyerId: buyerId,
+            sellerId: selectedSeller.id,
+            sellerName: selectedSeller.name,
+            sellerAddress: selectedSeller.address,
+            sellerTaxNumber: selectedSeller.taxNumber,
+            buyerId: selectedBuyer.id,
+            buyerName: selectedBuyer.name,
+            buyerAddress: selectedBuyer.address,
+            buyerTaxNumber: selectedBuyer.taxNumber,
             billNumber: `${billNumber}`,
             created: `${dateStringCreated}`,
             payDay: `${dateStringPayDay}`,
             deadline: `${dateStringDeadline}`,
             total: total,
-            afa: afa
+            afa: afa,
+            storno: 0
         };
         await postBillFunction(JSON.stringify(body));
         content.innerHTML = "";
-await listBills()
+        await listBills()
     }
     else {
         document.getElementById("message").innerHTML = "Adjon meg minden adatot!";
@@ -692,53 +823,50 @@ await listBills()
 
 async function listBills() {
     content.innerHTML = "";
-    buyers = await getAllBuyerFunction();
-    sellers = await getAllSellerFunction();
     bills = await getAllBillsFunction();
-    let selectedBuyer;
-    let selectedSeller;
     if (bills.length == 0) {
         content.innerHTML = "<p id='message'> Nincs számmla!</p>";
         return;
     }
     for (const bill of bills) {
 
-        for (const buyer of buyers) {
-            if (buyer.id == bill.buyerId) {
-                selectedBuyer = buyer;
-                break;
-            }
+        content.innerHTML += `<div class='lista' >`;
+        let itemNumber = document.getElementsByClassName('lista').length;
+        const item = document.getElementsByClassName('lista')[itemNumber - 1];
+        item.innerHTML += `<div class="bill-header">Számlaszám: ${bill.billNumber}</div>`;
+        item.innerHTML += ` <div class="bill-parties"> </div>`
+        let billParty = document.getElementsByClassName("bill-parties")[document.getElementsByClassName("bill-parties").length - 1]
+        billParty.innerHTML = `<div class="party"></div><div class="party"></div>`;
+        let party1 = document.getElementsByClassName("party")[document.getElementsByClassName("party").length - 2]
+        party1.innerHTML = `<h4>Eladó</h4><p>${bill.sellerName}</p><p>${bill.sellerAddress}</p><p>${bill.sellerTaxNumber}</p>`;
+        let party2 = document.getElementsByClassName("party")[document.getElementsByClassName("party").length - 1]
+        party2.innerHTML = `<h4>Vevő</h4><p>${bill.buyerName}</p><p>${bill.buyerAddress}</p><p>${bill.buyerTaxNumber}</p>`;
+
+        item.innerHTML += `<div class="dates"></div>`;
+          let dates = document.getElementsByClassName("dates")[document.getElementsByClassName("dates").length - 1];
+          dates.innerHTML = ` <div><strong>Kelt:</strong> ${bill.created}</div><div><strong>Határidő:</strong> ${bill.deadline}</div><div><strong>Befizetve:</strong> ${bill.payDay}</div>`;
+
+          item.innerHTML += `<div class="totals"></div>`;
+          let totals = document.getElementsByClassName("totals")[document.getElementsByClassName("totals").length - 1];
+          totals.innerHTML = ` <p>Nettó összeg: ${bill.total} Ft</p> <p>ÁFA: ${bill.afa}%</p><p>Bruttó összeg: ${(bill.total * (1 + bill.afa / 100)).toFixed(2)} Ft</p>`;
+        if (bill.storno == 1) {
+            item.innerHTML += `<p class="storno"> A számla sztornózva lett!</p>`;
         }
-        for (const seller of sellers) {
-            if (seller.id == bill.sellerId) {
-                selectedSeller = seller;
-                break;
-            }
+        else {
+            item.innerHTML += `<button class='modify' onclick='updateBill()' value='${bill.id}'>számla módosítása</button>`;
+            item.innerHTML += `<button class='stornoButton' onclick='stornoBill()' value='${bill.id}'>számla sztornózása</button>`;
         }
 
-        content.innerHTML += `<div class='lista' >`;
-        let elemSzam = document.getElementsByClassName('lista').length;
-        const elem = document.getElementsByClassName('lista')[elemSzam - 1];
-        elem.innerHTML += `<p> Eladó: ${selectedSeller.name} <br>Lakcím: ${selectedSeller.address}<br>Adószám: ${selectedSeller.taxNumber}</p>`;
-        elem.innerHTML += `<p> Vevő: ${selectedBuyer.name} <br>Lakcím: ${selectedBuyer.address}<br>Adószám: ${selectedBuyer.taxNumber}</p>`;
-        elem.innerHTML += `<p> Számlaszám: ${bill.billNumber}</p>`;
-        elem.innerHTML += `<p> Kelt: ${bill.created}</p>`;
-        elem.innerHTML += `<p> Befizetve: ${bill.payDay}</p>`;
-        elem.innerHTML += `<p> Határidő: ${bill.deadline}</p>`;
-        elem.innerHTML += `<p> Összeg: ${bill.total} Forint</p>`;
-        elem.innerHTML += `<p> Áfa: ${bill.afa} %</p>`;
-        elem.innerHTML += `<button class='modify' onclick='updateBill()' value='${bill.id}'>számla módosítása</button>`;
-        elem.innerHTML += `<button class='deleteButton' onclick='deleteBill()' value='${bill.id}'>számla törlése</button>`;
         content.innerHTML += `</div>`;
     }
 
     const modifyButtons = document.getElementsByClassName('modify');
-    const deleteButtons = document.getElementsByClassName('deleteButton');
+    const stornoButtons = document.getElementsByClassName('stornoButton');
     for (let i = 0; i < modifyButtons.length; i++) {
         modifyButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value });
     }
-    for (let i = 0; i < deleteButtons.length; i++) {
-        deleteButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value });
+    for (let i = 0; i < stornoButtons.length; i++) {
+        stornoButtons[i].addEventListener("click", (event) => { selectedBillId = event.target.value });
     }
 
 }
@@ -753,8 +881,41 @@ async function updateBill() {
             break;
         }
     }
-    content.innerHTML += `<label for='billNumber'>Számlaszám(például:11111111-11111111-11111111):</label> <input type='text' id='billNumber'  placeholder='11111111-11111111-11111111' value='${bill.billNumber}'> `;
-    content.innerHTML += `<label for='total' >Összeg:</label> <input type='number' id='total' min='0' value='${bill.total}'>`;
+    buyers = await getAllBuyerFunction();
+    sellers = await getAllSellerFunction();
+    if (buyers.length == 0) {
+        content.innerHTML = "<p id='message'> Nincs vevő!</p>";
+        return;
+    }
+    if (sellers.length == 0) {
+        content.innerHTML = "<p id='message'> Nincs eladó!</p>";
+        return;
+    }
+    content.innerHTML = "<label for='buyer'>Válassz vevőt:</label> <select name='buyer' id='buyer'>";
+    const buyerMenu = document.getElementById("buyer");
+    for (let i = 0; i < buyers.length; i++) {
+        if (buyers[i].id == bill.buyerId) {
+            buyerMenu.innerHTML += `<option value='${buyers[i].id}' class='buyers' selected>${buyers[i].name}</option>`;
+        }
+        else {
+            buyerMenu.innerHTML += `<option value='${buyers[i].id}' class='buyers'>${buyers[i].name}</option>`;
+        }
+    }
+    content.innerHTML += "</select>";
+
+    content.innerHTML += "<label for='seller'>Válassz eladót:</label> <select name='seller' id='seller'>";
+    const sellerMenu = document.getElementById("seller");
+    for (let i = 0; i < sellers.length; i++) {
+        if (sellers[i].id == bill.sellerId) {
+            sellerMenu.innerHTML += `<option value='${sellers[i].id}' class='sellers' selected>${sellers[i].name}</option>`;
+        }
+        else {
+            sellerMenu.innerHTML += `<option value='${sellers[i].id}' class='sellers'>${sellers[i].name}</option>`;
+        }
+
+    }
+    content.innerHTML += "</select>";
+    content.innerHTML += `<label for='total' >Nettó összeg:</label> <input type='number' id='total' min='0' value='${bill.total}'>`;
     content.innerHTML += `<label for='afa'>Áfa:</label> <input type='number' id='afa' min='0' value='${bill.afa}'>`;
 
     content.innerHTML += `<div id='createdP'>`;
@@ -791,25 +952,42 @@ async function saveUpdatedBill() {
     if (document.getElementById("message").innerHTML != "") {
         document.getElementById("message").innerHTML = "";
     }
-    const billNumber = document.getElementById("billNumber").value.trim();
+    sellers = await getAllSellerFunction();
+    buyers = await getAllBuyerFunction();
+    bills = await getAllBillsFunction()
+    const billNumber = bills[bills.length - 1].billNumber + 1;
     let total = document.getElementById("total").value.trim();
     let afa = document.getElementById("afa").value.trim();
     let created = document.getElementById("created").value;
     let payDay = document.getElementById("payDay").value.trim();
     let deadline = document.getElementById("deadline").value;
 
-    if (billNumber != undefined && billNumber.length > 0 && total != undefined && total.length > 0 && afa != undefined && afa.length > 0 && created != undefined && created.length > 0 && payDay != undefined && payDay.length > 0 && deadline != undefined && deadline.length > 0) {
-
-        if (billNumber.length != 26 || !billNumberRegex.test(billNumber)) {
-            document.getElementById("message").innerHTML = "Adjon meg helyes számlaszámot!";
-            return;
-        }
-        for (const bill of bills) {
-            if (bill.billNumber == billNumber && bill.id != selectedBillId) {
-                document.getElementById("message").innerHTML = "Ilyen számlaszám már létezik!";
-                return;
+    if (total != undefined && total.length > 0 && afa != undefined && afa.length > 0 && created != undefined && created.length > 0 && payDay != undefined && payDay.length > 0 && deadline != undefined && deadline.length > 0) {
+        const selllerList = document.getElementsByClassName('sellers');
+        const buyerList = document.getElementsByClassName('buyers');
+        for (const sellerid of selllerList) {
+            if (sellerid.selected) {
+                for (const seller of sellers) {
+                    if (seller.id == parseInt(sellerid.value)) {
+                        selectedSeller = seller;
+                        break;
+                    }
+                }
+                break;
             }
         }
+        for (const buyerid of buyerList) {
+            if (buyerid.selected) {
+                for (const buyer of buyers) {
+                    if (buyer.id == parseInt(buyerid.value)) {
+                        selectedBuyer = buyer;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
         total = Math.round(parseFloat(total))
         if (total < 0) {
             document.getElementById("message").innerHTML = "az összeg nem lehet negatív!";
@@ -820,50 +998,104 @@ async function saveUpdatedBill() {
             document.getElementById("message").innerHTML = "az ÁFA nem lehet negatív!";
             return;
         }
+        if (afa > 100) {
+            document.getElementById("message").innerHTML = "az ÁFA nem lehet 100%-nál nagyobb!";
+            return;
+        }
         created = new Date(created);
         deadline = new Date(deadline);
         payDay = new Date(payDay);
-        if (created >= deadline) {
-            document.getElementById("message").innerHTML = "A határidő nem lehet a keltezés napja vagy előtte!";
+        var timestamp = created.getTime() + (30 * 24 * 60 * 60 * 1000)
+        if (created > deadline) {
+            document.getElementById("message").innerHTML = "A határidő nem lehet a keltezés napja előtt!";
+            return;
+        }
+        if (deadline.getTime() > timestamp) {
+            document.getElementById("message").innerHTML = "A határidő nem lehet 30 nappal a létrehozás után!";
             return;
         }
         if (created > payDay) {
             document.getElementById("message").innerHTML = "Nem lehet a keltezés napja előtt befizetni!";
             return;
         }
-        if (deadline < payDay) {
-            document.getElementById("message").innerHTML = "Nem lehet a határidő után befizetni!";
-            return;
-        }
-        const dateStringCreated = `${created.getFullYear()}-${created.getMonth()+1 > 9 ? created.getMonth()+1 : "0" + (created.getMonth()+1)}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
-        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth()+1 > 9 ? deadline.getMonth()+1 : "0" + (deadline.getMonth()+1)}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
-        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth()+1 > 9 ? payDay.getMonth()+1 : "0" + (payDay.getMonth()+1)}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
+
+        const dateStringCreated = `${created.getFullYear()}-${created.getMonth() + 1 > 9 ? created.getMonth() + 1 : "0" + (created.getMonth() + 1)}-${created.getDate() > 9 ? created.getDate() : "0" + created.getDate()}`;
+        const dateStringDeadline = `${deadline.getFullYear()}-${deadline.getMonth() + 1 > 9 ? deadline.getMonth() + 1 : "0" + (deadline.getMonth() + 1)}-${deadline.getDate() > 9 ? deadline.getDate() : "0" + deadline.getDate()}`;
+        const dateStringPayDay = `${payDay.getFullYear()}-${payDay.getMonth() + 1 > 9 ? payDay.getMonth() + 1 : "0" + (payDay.getMonth() + 1)}-${payDay.getDate() > 9 ? payDay.getDate() : "0" + payDay.getDate()}`;
         let body = {
-            sellerId: `${bill.sellerId}`,
-            buyerId: `${bill.buyerId}`,
+            sellerId: selectedSeller.id,
+            sellerName: selectedSeller.name,
+            sellerAddress: selectedSeller.address,
+            sellerTaxNumber: selectedSeller.taxNumber,
+            buyerId: selectedBuyer.id,
+            buyerName: selectedBuyer.name,
+            buyerAddress: selectedBuyer.address,
+            buyerTaxNumber: selectedBuyer.taxNumber,
             billNumber: `${billNumber}`,
             created: `${dateStringCreated}`,
-            payDay: `${dateStringDeadline}`,
-            deadline: `${dateStringPayDay}`,
+            payDay: `${dateStringPayDay}`,
+            deadline: `${dateStringDeadline}`,
             total: total,
-            afa: afa
+            afa: afa,
+            storno: 0
         };
-        await putBillFunction(JSON.stringify(body), bill.id);
+        await postBillFunction(JSON.stringify(body));
+        let bodyStorno = {
+            sellerId: bill.sellerId,
+            sellerName: bill.sellerName,
+            sellerAddress: bill.sellerAddress,
+            sellerTaxNumber: bill.sellerTaxNumber,
+            buyerId: bill.buyerId,
+            buyerName: bill.buyerName,
+            buyerAddress: bill.buyerAddress,
+            buyerTaxNumber: bill.buyerTaxNumber,
+            billNumber: bill.billNumber,
+            created: bill.created,
+            payDay: bill.payDay,
+            deadline: bill.deadline,
+            total: bill.total,
+            afa: bill.afa,
+            storno: 1
+        };
+        await putBillFunction(JSON.stringify(bodyStorno), bill.id);
         content.innerHTML = "";
-await listBills()
+        await listBills()
     }
     else {
         document.getElementById("message").innerHTML += "Adjon meg minden adatot";
     }
 }
 
-async function deleteBill() {
-    if(confirm("Biztos törli a számlát?") == false)
-    {
+async function stornoBill() {
+    if (confirm("Biztos sztornózza a számlát?") == false) {
         return;
     }
     bills = await getAllBillsFunction();
-    await deleteBillFunction(selectedBillId);
+    let selectedBill;
+    for (const bill of bills) {
+        if (bill.id == selectedBillId) {
+            selectedBill = bill;
+            break;
+        }
+    }
+    let body = {
+        sellerId: selectedBill.sellerId,
+        sellerName: selectedBill.sellerName,
+        sellerAddress: selectedBill.sellerAddress,
+        sellerTaxNumber: selectedBill.sellerTaxNumber,
+        buyerId: selectedBill.buyerId,
+        buyerName: selectedBill.buyerName,
+        buyerAddress: selectedBill.buyerAddress,
+        buyerTaxNumber: selectedBill.buyerTaxNumber,
+        billNumber: selectedBill.billNumber,
+        created: selectedBill.created,
+        payDay: selectedBill.payDay,
+        deadline: selectedBill.deadline,
+        total: selectedBill.total,
+        afa: selectedBill.afa,
+        storno: 1
+    };
+    await putBillFunction(JSON.stringify(body), selectedBill.id);
     content.innerHTML = "";
     listBills();
 

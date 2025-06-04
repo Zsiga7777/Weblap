@@ -159,16 +159,16 @@ app.get("/bills", (req, res) => {
 
 app.post("/bills", (req, res) => {
     try {
-        const { sellerId, buyerId, billNumber, created, payDay, deadline, total, afa } = req.body;
-        if (!sellerId || !buyerId || !billNumber || !created || !payDay || !deadline || !total || !afa) {
+        const { sellerId,sellerName,sellerAddress,sellerTaxNumber, buyerId,buyerName,buyerAddress,buyerTaxNumber, billNumber, created, payDay, deadline, total, afa, storno } = req.body;
+        if (!sellerId ||!sellerName || !sellerAddress || !sellerTaxNumber || !buyerId || !buyerName || !buyerAddress || !buyerTaxNumber || !billNumber || !created || !payDay || !deadline || !total || !afa ||storno == null) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
-        const savedBill = db.saveBill(sellerId, buyerId, billNumber, created, payDay, deadline, total, afa);
+        const savedBill = db.saveBill(sellerId,sellerName,sellerAddress,sellerTaxNumber, buyerId,buyerName,buyerAddress,buyerTaxNumber, billNumber, created, payDay, deadline, total, afa, storno);
 
         if (savedBill.changes != 1) {
             return res.status(501).json({ message: "Bill save falied" });
         }
-        res.status(201).json({ id: savedBill.lastInsertRowid, sellerId, buyerId, billNumber, created, payDay, deadline, total, afa });
+        res.status(201).json({ id: savedBill.lastInsertRowid, sellerId,sellerName,sellerAddress,sellerTaxNumber, buyerId,buyerName,buyerAddress,buyerTaxNumber, billNumber, created, payDay, deadline, total, afa, storno});
     }
     catch (err) {
         res.status(500).json({ message: `${err}` });
@@ -177,16 +177,16 @@ app.post("/bills", (req, res) => {
 
 app.put("/bills/:id", (req, res) => {
     try {
-        const { sellerId, buyerId, billNumber, created, payDay, deadline, total, afa } = req.body;
-        if (!sellerId || !buyerId || !billNumber || !created || !payDay || !deadline || !total || !afa) {
+        const { sellerId,sellerName,sellerAddress,sellerTaxNumber, buyerId,buyerName,buyerAddress,buyerTaxNumber, billNumber, created, payDay, deadline, total, afa, storno} = req.body;
+        if ((!sellerName || !sellerAddress || !sellerTaxNumber ||  !buyerName || !buyerAddress || !buyerTaxNumber || !billNumber || !created || !payDay || !deadline || !total || !afa ||storno == null)) {
             return res.status(400).json({ message: "Invalid credentials" });
         }
         const id = +req.params.id;
-        const updatedBill = db.updateBill(id, sellerId, buyerId, billNumber, created, payDay, deadline, total, afa);
+        const updatedBill = db.updateBill(id, sellerId,sellerName,sellerAddress,sellerTaxNumber, buyerId,buyerName,buyerAddress,buyerTaxNumber, billNumber, created, payDay, deadline, total, afa, storno);
         if (updatedBill.changes != 1) {
-            return res.status(501).json({ message: "Blog update falied" });
+            return res.status(501).json({ message: "Bill update falied" });
         }
-        res.status(200).json({ id, sellerId, buyerId, billNumber, created, payDay, deadline, total, afa });
+        res.status(200).json({ id, sellerId,sellerName,sellerAddress,sellerTaxNumber, buyerId,buyerName,buyerAddress,buyerTaxNumber, billNumber, created, payDay, deadline, total, afa, storno });
     }
     catch (err) {
         res.status(500).json({ message: `${err}` });
